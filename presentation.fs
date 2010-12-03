@@ -6,7 +6,8 @@
 : <b> <s> ;
 : <i> <s> ;
 : <np> <s> ;
+: <+> ;
 
 bye
 
-here ." Dies ist eine Testpresentation" <h>
+here <presentation> ." Dies ist eine Testpresentation" <h> 
