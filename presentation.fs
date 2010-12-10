@@ -23,26 +23,29 @@
 : <b> csi c, <_> ;
 : <i> csi c, <_> ;
 : <np> begin , 0<> until ;
-: <+> ( addr1 len1 addr2 len2 -- addrdst lendst )
-	rot 2dup + here ( addr1 addr2 len2 len1 lendst addrdst )
-	2-rot -rot ( lendst addrdst addr1 len1 addr2 len2 )
-	2swap 2rot ( addr2 len2 addr1 len1 lendst addrdst )
-	2dup cells allot ( dst allocated )
-	copy copy
+\ : <+> ( addr1 len1 addr2 len2 -- addrdst lendst )
+\	rot 2dup + here ( addr1 addr2 len2 len1 lendst addrdst )
+\	2-rot -rot ( lendst addrdst addr1 len1 addr2 len2 )
+\	2swap 2rot ( addr2 len2 addr1 len1 lendst addrdst )
+\	2dup chars allot ( dst allocated )
+\	copy copy
+\ ;
+: @@ ( addr len -- )
+	here -rot ( dst src len )
+	copy drop
 ;
-: " s" ; immediate
 
 bye
 
 <presentation>
-" Dies ist eine Testpresentation" <h>
-" Eines Tages hatten wir (" @@ <b> " Harald Steinlechner" @@ </b> " und"
-	" Denis Knauf" <b> " die tolle Idee, eine Presentationssoftware zu schreiben" <n> <p>
+s" Dies ist eine Testpresentation" <h>
+s" Eines Tages hatten wir (" @@ <b> s" Harald Steinlechner" @@ </b> s" und" @@
+	<b> s" Denis Knauf" @@ </b> s" die tolle Idee, eine Presentationssoftware zu schreiben" @@ <p>
 <np>
-" Ergebnis:" <h>
-" Das hier" <b> <p>
+s" Ergebnis:" @@ <h>
+<b> s" Das hier" @@ </b> <p>
 <np>
-" Sieht doch garnicht so schlecht aus" <p>
+s" Sieht doch garnicht so schlecht aus" @@ <p>
 </presentation>
 
 \ presentation ist gestartet: erste Seite wird angezeigt
