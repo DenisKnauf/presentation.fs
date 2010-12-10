@@ -1,13 +1,51 @@
 #! /usr/bin/gforth
-: <presentation> ;
-: <s> , ;
-: <h> <s> ;
-: <p> <s> ;
-: <b> <s> ;
-: <i> <s> ;
-: <np> <s> ;
-: <+> ;
+: copy ( addrdst addrsrc len -- addrdstend )
+	over ( dst src len src ) + swap ( dst end src )
+	do ( dst+ )
+		i ( dst+ src+ ) c@ ( dst+ chr )
+		over ( dst+ chr dst+ ) c! ( dst+ ) 1+
+	loop
+;
+
+: </presentation> 0 ;
+: page_steps ( 0 [x] -- 0 x )
+	\ x muss ungleich 0 sein. falls x nicht vorhanden: 1
+	dup 0= if 1 then
+;
+: n ( 0 [x] -- 0 )
+	page_steps
+	( ... x seiten weiterspringen ... )
+;
+: csi 27 c, 91 c,
+: <--> ;
+: <_> ;
+: <h> <--> ;
+: <b> csi c, <_> ;
+: <i> csi c, <_> ;
+: <np> begin , 0<> until ;
+: <+> ( addr1 len1 addr2 len2 -- addrdst lendst )
+	rot 2dup + here ( addr1 addr2 len2 len1 lendst addrdst )
+	2-rot -rot ( lendst addrdst addr1 len1 addr2 len2 )
+	2swap 2rot ( addr2 len2 addr1 len1 lendst addrdst )
+	2dup cells allot ( dst allocated )
+	copy copy
+;
+: " s" ; immediate
 
 bye
 
-here <presentation> ." Dies ist eine Testpresentation" <h> 
+<presentation>
+" Dies ist eine Testpresentation" <h>
+" Eines Tages hatten wir (" @@ <b> " Harald Steinlechner" @@ </b> " und"
+	" Denis Knauf" <b> " die tolle Idee, eine Presentationssoftware zu schreiben" <n> <p>
+<np>
+" Ergebnis:" <h>
+" Das hier" <b> <p>
+<np>
+" Sieht doch garnicht so schlecht aus" <p>
+</presentation>
+
+\ presentation ist gestartet: erste Seite wird angezeigt
+n \ zweite Seite
+p \ erste Seite
+2 n \ dritte Seite
