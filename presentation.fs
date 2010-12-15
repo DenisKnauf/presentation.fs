@@ -1,4 +1,5 @@
 #! /usr/bin/gforth
+
 : copy ( addrdst addrsrc len -- addrdstend )
 	over ( dst src len src ) + swap ( dst end src )
 	do ( dst+ )
@@ -16,13 +17,16 @@
 	page_steps
 	( ... x seiten weiterspringen ... )
 ;
-: csi 27 c, 91 c,
-: <--> ;
-: <_> ;
-: <h> <--> ;
-: <b> csi c, <_> ;
-: <i> csi c, <_> ;
-: <np> begin , 0<> until ;
+: csi 27 91 ;
+: <h> ( -- addr 0 ) 2 c, here 0 ;
+: </h> ( addr len -- ) 3 c, swap ! ;
+: <p> ( -- addr 0 ) 4 c, here 0 ;
+: </p> ( addr len -- ) 5 c, swap ! ;
+: <i> ( -- ) 6 c, ;
+: </i> ( -- ) 7 c, ;
+: <b> ( -- ) 8 c, ;
+: </b> ( -- ) 9 c, ;
+\ : <np> begin , 0<> until ;
 \ : <+> ( addr1 len1 addr2 len2 -- addrdst lendst )
 \	rot 2dup + here ( addr1 addr2 len2 len1 lendst addrdst )
 \	2-rot -rot ( lendst addrdst addr1 len1 addr2 len2 )
@@ -30,22 +34,22 @@
 \	2dup chars allot ( dst allocated )
 \	copy copy
 \ ;
-: @@ ( addr len -- )
-	here -rot ( dst src len )
-	copy drop
-;
+: !! ( len addr len -- len ) 1 c, dup rot , , + ;
 
 bye
 
 <presentation>
-s" Dies ist eine Testpresentation" <h>
-s" Eines Tages hatten wir (" @@ <b> s" Harald Steinlechner" @@ </b> s" und" @@
-	<b> s" Denis Knauf" @@ </b> s" die tolle Idee, eine Presentationssoftware zu schreiben" @@ <p>
+<h> s" Dies ist eine Testpresentation" !! </h>
+<p>
+	s" Eines Tages hatten wir (" !! <i> s" Harald Steinlechner" !! </i>
+	s" und" !! <i> s" Denis Knauf" !! </i>
+	s" die tolle Idee, eine Presentationssoftware zu schreiben" !!
+</p>
 <np>
-s" Ergebnis:" @@ <h>
-<b> s" Das hier" @@ </b> <p>
+<h> s" Ergebnis:" !! </h>
+<p> <b> s" Das hier" !! </b> </p>
 <np>
-s" Sieht doch garnicht so schlecht aus" @@ <p>
+<p> s" Sieht doch garnicht so schlecht aus" !! </p>
 </presentation>
 
 \ presentation ist gestartet: erste Seite wird angezeigt
