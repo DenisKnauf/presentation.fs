@@ -1,7 +1,5 @@
 #! /usr/bin/gforth
-\ 
 \ here-allokation wird als fifo verwendet.
-\ 
 : copy ( addrdst addrsrc len -- addrdstend )
 	over ( dst src len src ) + swap ( dst end src )
 	do ( dst+ )
@@ -10,68 +8,76 @@
 	loop
 ;
 
-: <presentation> ( -- 0 addr0 ) 0 here ;
-: </presentation> ( 0 <addr...> -- faddr laddr paddr 0 )
-	here .s \ 0 <addr...> faddr
-	begin swap dup \ 0 <addr..> addr0 faddr
-	while
-		s" New page at " type here . s" to " type dup . newline type
-		, \ 0 <addr..> faddr
-	repeat .s
-	drop \ faddr
-	here dup 0 \ faddr laddr paddr 0
-;
-
 : csi ( -- ) 27 emit 91 emit ;
 : sgr ( u -- ) csi 0 0 d.r 109 emit ;
-: beep 7 type ;
+: beep 7 emit s" *beep* " type ;
 \ Es folgen ein paar blockorientierte Kennzeichnungen.
-: {h}  ( addr -- addr ) ;
+: {h}  ( addr -- addr ) cell+ ; \ header
 : {/h} ( addr -- addr ) ;
-: {p}  ( addr -- addr ) ;
+: {p}  ( addr -- addr ) cell+ ; \ paragraph
 : {/p} ( addr -- addr ) ;
-: <h>  ( -- addr u0 )  ['] {h} , here 0 ;
+: <h>  ( -- addr u0 )  ['] {h}  , here 0 ;
 : </h> ( addr len -- ) ['] {/h} , swap ! ;
-: <p>  ( -- addr u0 )  ['] {p} , here 0 ;
+: <p>  ( -- addr u0 )  ['] {p}  , here 0 ;
 : </p> ( addr len -- ) ['] {/p} , swap ! ;
 \ Es folgen ein paar syntaktische Textauszeichnungen.
 : {i}   ( addr -- addr )  7 sgr ;
 : {/i}  ( addr -- addr ) 27 sgr ;
-: {b}   ( addr -- addr )  1 sgr ;
+: {b}   ( addr -- addr )  1 sgr ; \ bold
 : {/b}  ( addr -- addr ) 22 sgr ;
-: {u}   ( addr -- addr )  4 sgr ;
+: {u}   ( addr -- addr )  4 sgr ; \ underline
 : {/u}  ( addr -- addr ) 24 sgr ;
-: {fc}  ( addr -- addr ) dup @ 30 + sgr 1 cells + ;
+: {fc}  ( addr -- addr ) dup @ 30 + sgr cell+ ; \ frontcolor
 : {/fc} ( addr -- addr ) 39 sgr ;
-: {bc}  ( addr -- addr ) dup @ 40 + sgr 1 cells + ;
+: {bc}  ( addr -- addr ) dup @ 40 + sgr cell+ ; \ backgroundcolor
 : {/bc} ( addr -- addr ) 49 sgr ;
-: <i>   ( -- ) ['] {i}   , ;
-: </i>  ( -- ) ['] {/i}  , ;
-: <u>   ( -- ) ['] {u}   , ;
-: </u>  ( -- ) ['] {/u}  , ;
-: <b>   ( -- ) ['] {b}   , ;
-: </b>  ( -- ) ['] {/b}  , ;
-: <fc>  ( -- ) ['] {fc}  , ;
+: <i>   ( -- ) ['] {i}  , ;
+: </i>  ( -- ) ['] {/i} , ;
+: <u>   ( -- ) ['] {u}  , ;
+: </u>  ( -- ) ['] {/u} , ;
+: <b>   ( -- ) ['] {b}  , ;
+: </b>  ( -- ) ['] {/b} , ;
+: <fc>  ( -- ) ['] {fc} , , ;
 : </fc> ( -- ) ['] {/fc} , ;
-: <bc>  ( -- ) ['] {bc}  , ;
+: <bc>  ( -- ) ['] {bc} , , ;
 : </bc> ( -- ) ['] {/bc} , ;
 
-: <np> ( -- addr ) \ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge
-	here
+: {np} ( -- )
+	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
+	\ csi s" 2J" type \ Bildschirm leeren
 ;
-\ : <+> ( addr1 len1 addr2 len2 -- addrdst lendst )
-\	rot 2dup + here ( addr1 addr2 len2 len1 lendst addrdst )
-\	2-rot -rot ( lendst addrdst addr1 len1 addr2 len2 )
-\	2swap 2rot ( addr2 len2 addr1 len1 lendst addrdst )
-\	2dup chars allot ( dst allocated )
-\	copy copy
-\ ;
-: !! ( len0 addr1 len1 -- len )
-	1 ,
+: <np> ( -- addr ) \ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge
+	here ['] {np} ,
+;
+: {!!} ( addr -- addr+2 )
+	s" string-> " type .s newline type
+	dup @ \ addr straddr
+	cell+ \ straddr addr
+	tuck @ \ addr straddr strlen
+	type \ addr
+	cell+
+	s" string<- " type .s newline type
+;
+: !! ( len0 addr1 len1 -- len !! '{!!} addr1 len1 )
+	['] {!!} ,
 	dup \ len0 addr1 len1 len1
 	rot , , \ len0 len1 len1 addr1 -> len0 len1
-	+
+	+ \ len0+len1
 ;
+
+: <presentation> ( -- 0 addr0 !! '{np} ) 0 here ['] {np} , ;
+: </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
+	here \ 0 <addr...> faddr
+	0 , 0 , 0 , 0 ,
+	begin swap dup \ 0 <addr..> addr0 faddr
+	while , \ 0 <addr..> faddr
+	repeat .s
+	drop \ faddr
+	here dup 0 \ faddr laddr paddr 0
+;
+: pres_page_cur ( addr -- addr ) ;
+: pres_page_from ( addr -- addr ) cell+ ;
+: pres_page_to ( addr -- addr ) 2 cells + ;
 
 \ faddr: erste Seitenzeigeradresse (letzte Presentationsseite)
 \ laddr: letzte Seitenzeigeradresse (erste Presentationsseite)
@@ -80,29 +86,36 @@
 : page_steps ( laddr paddr 0 [u] -- laddr naddr )
 	\ u muss ungleich 0 sein. falls u nicht vorhanden: 1
 	dup 0= if 1 then \ laddr paddr 0 u
-	nip cells -
+	nip cells - .s
 ;
 : validpage? ( faddr laddr paddr -- faddr laddr paddr u )
-	2dup > \ faddr laddr paddr u
-	2over drop rot tuck <
-	rot and
+	2dup < \ faddr laddr paddr u
+	2over drop rot tuck >=
+	rot \ faddr laddr paddr u u
+	if drop cell - -1 \ faddr laddr paddr-1 -1
+	else if cell+ -1 \ faddr laddr paddr+1 -1
+	else 0 \ faddr laddr paddr 0
+	then then
 ;
 : showpage' ( paddr -- )
-	dup cell+ \ paddr paddr+cell
+	dup cell - .s \ paddr paddr+cell
 	@ swap @ \ naddr addr \ Seiteninhaltsadressen
-	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
-	\ csi s" 2J" type \ Bildschirm leeren
-	begin 2dup >
+	begin
+		s" ++ " type 2dup . .
+		2dup >
+		dup . newline type
 	while
 		dup cell+ swap \ naddr xtaddr xtaddr
 		@ \ naddr xtaddr xt
+		s" -> " type .s newline type
 		execute \ verschiebt eventuell den Zeiger noch weiter, wenn es Parameter erwartet.
+		s" <- " type .s newline type
 	repeat
-	drop drop
+	2drop
 ;
 : showpage ( faddr laddr paddr -- faddr laddr paddr 0 )
 	validpage?
-	0= if beep then
+	if beep then
 	dup showpage' 0
 ;
 : n ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
@@ -114,11 +127,13 @@
 	showpage
 ;
 : p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
-	negate n
+	page_steps negate
+	showpage
 ;
 
+here . newline type
 <presentation>
-<h> s" Dies ist eine Testpresentation" !! </h>
+<h> s" Dies ist eine Testpresentation!" !! </h>
 <p>
 	s" Eines Tages hatten wir (" !! <i> s" Harald Steinlechner" !! </i>
 	s" und" !! <i> s" Denis Knauf" !! </i>
