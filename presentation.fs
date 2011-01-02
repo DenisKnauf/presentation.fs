@@ -8,6 +8,10 @@
 	loop
 ;
 
+: term-size form ;
+: term-height ( -- i ) term-size drop ;
+: term-width ( -- i ) term-size nip ;
+
 : isnewline? ( c -- i ) dup 10 = swap 13 = or ;
 : isspace?   ( c -- i ) dup 9 = over 11 = or swap 32 = or ;
 : anyspaces? ( c -- i ) dup isnewline? isspace? or ;
@@ -22,11 +26,7 @@
 	endcase nip
 ;
 
-variable ptype-lenl_
-: ptype-lenl
-	ptype-lenl_
-	s\" \nptype-lenl = " type dup @ . cr
-;
+variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
 : ptype-word ( addrw addrc c -- addrc+1 )
 	-rot \ c addrw addrc
 	dup -rot over - type \ c addrc
@@ -89,24 +89,15 @@ variable ptype-lenl_
 	over ptype-lenl !
 	nip nip tuck - type
 ;
-: ptype ( addr len ) 80 ptype-lenl @ ptype-init ptype' ;
+: ptype ( addr len -- ) term-width ptype-lenl @ ptype-init ptype' ;
 : ptype-reset ( -- ) 0 ptype-lenl ! ;
-ptype-reset
+ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 
 : escape ( -- addr len ) s\" \e" ;
 : csi ( -- addr len ) s\" \e[" ;
 : sgr ( u -- ) csi type 0 0 d.r 109 ( m ) emit ;
 : beep 7 emit s" *beep* " type ;
 
-\ Es folgen ein paar blockorientierte Kennzeichnungen.
-: {h}  ( addr -- addr ) cr s"    " type 3 ptype-lenl ! cell+ ; \ header
-: <h>  ( -- addr u0 )  ['] {h}  , here 0 , 0 ;
-: {/h} ( addr -- addr ) cr ;
-: </h> ( addr len -- ) ['] {/h} , swap ! ;
-: {p}  ( addr -- addr ) cr ptype-reset cell+ ; \ paragraph
-: <p>  ( -- addr u0 )  ['] {p}  , here 0 , 0 ;
-: {/p} ( addr -- addr ) cr ;
-: </p> ( addr len -- ) ['] {/p} , swap ! ;
 \ Es folgen ein paar syntaktische Textauszeichnungen.
 : {i}   ( addr -- addr )  7 sgr ;
 : <i>   ( -- ) ['] {i}  , ;
@@ -128,13 +119,52 @@ ptype-reset
 : <bc>  ( -- ) ['] {bc} , , ;
 : {/bc} ( addr -- addr ) 49 sgr ;
 : </bc> ( -- ) ['] {/bc} , ;
+: {br}  ( addr -- addr ) cr ptype-reset ;
+: <br>  ( -- ) ['] {br} , ;
+\ Es folgen ein paar blockorientierte Kennzeichnungen.
+: {h}   ( addr -- addr )
+	cr
+	term-width over @ - 2 / \ addr width-twidth/2
+	dup ptype-lenl !
+	1 +do 32 emit loop
+	cell+
+	{b}
+; \ header
+: <h>   ( -- addr u0 )  ['] {h}  , here 0 , 0 ;
+: {/h}  ( addr -- addr )
+	{/b}
+	cr
+	term-width over @ - 2 / \ addr width-twidth/2
+	dup
+	2 +do 32 emit loop
+	ptype-lenl @ swap 2 - +do 61 ( = ) emit loop
+	cr
+	cell+
+;
+: </h>  ( addr len -- ) ['] {/h} , dup , swap ! ;
+: {p}   ( addr -- addr ) cr ptype-reset cell+ ; \ paragraph
+: <p>   ( -- addr u0 )  ['] {p}  , here 0 , 0 ;
+: {/p}  ( addr -- addr ) cr ;
+: </p>  ( addr len -- ) ['] {/p} , swap ! ;
+: {li}  ( addr -- addr )
+	s\"   * " type
+	4 ptype-lenl !
+	cell+
+;
+: <li>  ( -- addr u0 ) ['] {li} , here 0 , 0 ;
+: {/li} ( addr -- addr ) cr ;
+: </li> ( addr len -- ) ['] {/li} , swap ! ;
 
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
-	\ csi type s\" 2J" type \ Bildschirm leeren
+	page \ Bildschirm leeren
 ;
-: <np> ( -- addr ) \ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge
-	here ['] {np} ,
+: {/np} ( -- )
+	\ 30 sgr 40 sgr
+	0 term-height 2 - at-xy
+;
+: <np> ( -- addr ) \ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge)
+	['] {/np} , here ['] {np} ,
 ;
 
 : {!!} ( addr -- addr+2 )
@@ -143,7 +173,7 @@ ptype-reset
 	cell+   \ straddr addr
 	tuck    \ addr straddr addr
 	@       \ addr straddr strlen
-	ptype-init ptype'   \ addr
+	ptype   \ addr
 	cell+
 ;
 : !! ( len0 addr1 len1 -- len !! '{!!} addr1 len1 )
@@ -152,16 +182,9 @@ ptype-reset
 	rot , , \ len0 len1 len1 addr1 -> len0 len1
 	+ \ len0+len1
 ;
+:noname ( -- ) 34 parse save-mem !! ; :noname 34 parse postpone sliteral postpone !! ; interpret/compile: !"
+:noname ( -- ) \"-parse save-mem !! ; :noname \"-parse postpone sliteral postpone !! ; interpret/compile: !\"
 
-: <presentation> ( -- 0 addr0 !! '{np} ) 0 here ['] {np} , ;
-: </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
-	here \ 0 <addr...> faddr
-	begin swap dup \ 0 <addr..> addr0 faddr
-	while , \ 0 <addr..> faddr
-	repeat \ .s cr
-	drop \ faddr
-	here dup 0 \ faddr laddr paddr 0
-;
 : pres_page_cur ( addr -- addr ) ;
 : pres_page_from ( addr -- addr ) cell+ ;
 : pres_page_to ( addr -- addr ) 2 cells + ;
@@ -196,42 +219,35 @@ ptype-reset
 	2drop
 ;
 : showpage ( faddr laddr paddr -- faddr laddr paddr 0 )
-	cells -
 	validpage?
 	if beep then
 	dup showpage' 0
 ;
 : n ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
-	page_steps \ faddr laddr paddr x
+	page_steps cells - \ faddr laddr paddr
 	showpage
 ;
 : g ( faddr laddr paddr 0 u -- faddr laddr paddr 0 )
+	cells nip nip over swap -
 	showpage
 ;
 : p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
-	page_steps negate
+	page_steps cells +
 	showpage
 ;
+: u ( faddr laddr paddr X -- faddr laddr paddr 0 )
+	drop showpage
+;
+: q bye ;
 
-here
-<presentation>
-<h> s" Dies ist eine Testpresentation!" !! </h>
-<p>
-	s" Eines Tages hatten wir [" !! <b> s" Harald Steinlechner" !! </b>
-	s"  und " !! <b> s" Denis Knauf" !! </b>
-	s" ] die tolle Idee, eine Presentationssoftware zu schreiben." !!
-</p>
-<np>
-<h> s" Ergebnis" !! </h>
-<p> <b> s" Das hier" !! </b> </p>
-<np>
-<h> s" hallo" !! </h>
-<p> s" Sieht doch garnicht so schlecht aus" !! </p>
-</presentation>
-
-( bye
-\ presentation ist gestartet: erste Seite wird angezeigt
-n \ zweite Seite
-p \ erste Seite
-2 n \ dritte Seite
-)
+: <presentation> ( -- addr0 0 addr1 !! '{np} ) here 0 here ['] {np} , ;
+: </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
+	<np>
+	here \ 0 <addr...> faddr
+	begin swap dup \ 0 <addr..> addr0 faddr
+	while , \ 0 <addr..> faddr
+	repeat \ .s cr
+	drop \ faddr
+	here dup 0 \ faddr laddr paddr 0
+	\ u \ Praesentation starten
+;
