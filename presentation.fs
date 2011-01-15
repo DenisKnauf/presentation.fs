@@ -2,11 +2,14 @@
 \ here-allokation wird als fifo verwendet.
 : copy ( addrdst addrsrc len -- addrdstend )
 	over ( dst src len src ) + swap ( dst end src )
-	do ( dst+ )
+	+do ( dst+ )
 		i ( dst+ src+ ) c@ ( dst+ chr )
 		over ( dst+ chr dst+ ) c! ( dst+ ) 1+
 	loop
 ;
+
+\ 2-rot ist bei gforth anscheinend nicht definiert
+: 2-rot { a1 a2 b1 b2 c1 c2 } c1 c2 a1 a2 b1 b2 ;
 
 : term-size form ;
 : term-height ( -- i ) term-size drop ;
@@ -96,7 +99,10 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : escape ( -- addr len ) s\" \e" ;
 : csi ( -- addr len ) s\" \e[" ;
 : sgr ( u -- ) csi type 0 0 d.r 109 ( m ) emit ;
-: beep 7 emit s" *beep* " type ;
+: beep
+	0 term-height 2 - at-xy
+	7 emit s" *beep* not" type
+;
 
 \ Es folgen ein paar syntaktische Textauszeichnungen.
 : {i}   ( addr -- addr )  7 sgr ;
@@ -120,9 +126,9 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : {/bc} ( addr -- addr ) 49 sgr ;
 : </bc> ( -- ) ['] {/bc} , ;
 : {br}  ( addr -- addr ) cr ptype-reset ;
-: <br>  ( -- ) ['] {br} , ;
+: <br>  ( -- , xt-{br} ) ['] {br} , ;
 \ Es folgen ein paar blockorientierte Kennzeichnungen.
-: {h}   ( addr -- addr )
+: {h}   ( addr , len -- addr )
 	cr
 	term-width over @ - 2 / \ addr width-twidth/2
 	dup ptype-lenl !
@@ -130,8 +136,8 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	cell+
 	{b}
 ; \ header
-: <h>   ( -- addr u0 )  ['] {h}  , here 0 , 0 ;
-: {/h}  ( addr -- addr )
+: <h>   ( -- addr 0 , xt-{h} 0 )  ['] {h}  , here 0 , 0 ;
+: {/h}  ( addr , len -- addr1 )
 	{/b}
 	cr
 	term-width over @ - 2 / \ addr width-twidth/2
@@ -141,19 +147,19 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	cr
 	cell+
 ;
-: </h>  ( addr len -- ) ['] {/h} , dup , swap ! ;
+: </h>  ( addr len -- , xt-{/h} len0 ) ['] {/h} , dup , swap ! ;
 : {p}   ( addr -- addr ) cr ptype-reset cell+ ; \ paragraph
-: <p>   ( -- addr u0 )  ['] {p}  , here 0 , 0 ;
+: <p>   ( -- addr u0 , xt-{p} 0 ) ['] {p}  , here 0 , 0 ;
 : {/p}  ( addr -- addr ) cr ;
-: </p>  ( addr len -- ) ['] {/p} , swap ! ;
+: </p>  ( addr len -- , xt-{/p} ) ['] {/p} , swap ! ;
 : {li}  ( addr -- addr )
 	s\"   * " type
 	4 ptype-lenl !
 	cell+
 ;
-: <li>  ( -- addr u0 ) ['] {li} , here 0 , 0 ;
+: <li>  ( -- addr u0 , xt-{li} 0 ) ['] {li} , here 0 , 0 ;
 : {/li} ( addr -- addr ) cr ;
-: </li> ( addr len -- ) ['] {/li} , swap ! ;
+: </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! ;
 
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
@@ -163,8 +169,11 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	\ 30 sgr 40 sgr
 	0 term-height 2 - at-xy
 ;
-: <np> ( -- addr ) \ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge)
-	['] {/np} , here ['] {np} ,
+: <np> ( -- addr , xt-{/np} xt-{np} )
+	\ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge)
+	['] {/np} ,
+	here
+	['] {np} ,
 ;
 
 : {!!} ( addr -- addr+2 )
@@ -176,7 +185,7 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	ptype   \ addr
 	cell+
 ;
-: !! ( len0 addr1 len1 -- len !! '{!!} addr1 len1 )
+: !! ( len0 addr1 len1 -- len , xt-{!!} addr1 len1 )
 	['] {!!} ,
 	dup \ len0 addr1 len1 len1
 	rot , , \ len0 len1 len1 addr1 -> len0 len1
@@ -202,8 +211,8 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	2dup <= \ faddr laddr paddr u
 	2over drop rot tuck >
 	rot \ faddr laddr paddr u u
-	if drop cell - -1 \ faddr laddr paddr-1 -1
-	else if cell+ -1 \ faddr laddr paddr+1 -1
+	if drop cell - 1 \ faddr laddr paddr-1 -1 \ paddr-overflow
+	else if cell+ -1 \ faddr laddr paddr+1 -1 \ paddr-underflow
 	else 0 \ faddr laddr paddr 0
 	then then
 ;
@@ -218,29 +227,18 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 	repeat
 	2drop
 ;
-: showpage ( faddr laddr paddr -- faddr laddr paddr 0 )
-	validpage?
+: showpage ( faddr laddr paddr -- faddr laddr paddr0 0 )
+	validpage? 0 tuck 2-rot drop \ i 0 faddr laddr paddr0
+	dup showpage' 0 2rot drop \ faddr laddr paddr0 0 i
 	if beep then
-	dup showpage' 0
 ;
-: n ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
-	page_steps cells - \ faddr laddr paddr
-	showpage
-;
-: g ( faddr laddr paddr 0 u -- faddr laddr paddr 0 )
-	cells nip nip over swap -
-	showpage
-;
-: p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 )
-	page_steps cells +
-	showpage
-;
-: u ( faddr laddr paddr X -- faddr laddr paddr 0 )
-	drop showpage
-;
+: n ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 ) page_steps cells - showpage ;
+: g ( faddr laddr paddr 0  u  -- faddr laddr paddr 0 ) cells nip nip over swap - showpage ;
+: p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 ) page_steps cells + showpage ;
+: u ( faddr laddr paddr X     -- faddr laddr paddr 0 ) drop showpage ;
 : q bye ;
 
-: <presentation> ( -- addr0 0 addr1 !! '{np} ) here 0 here ['] {np} , ;
+: <presentation> ( -- addr0 0 addr1 , xt-{np} ) here 0 here ['] {np} , ;
 : </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
 	<np>
 	here \ 0 <addr...> faddr

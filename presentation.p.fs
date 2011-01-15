@@ -60,8 +60,8 @@
 <np>
 	<h> !" Und Farben" </h>
 	<br>
-	<li> !" Hintergrundfarbe: " <f> !" 3 <bc>" </f> </li>
-	<li> !" Vordergrundfarbe: " <f> !" 5 <fc>" </f> </li>
+	<li> !" Hintergrundfarbe: " <f> s\" 3 <bc> !\" text\" </bc> " !! </f> !" : " 3 <bc> !\" text" </bc> </li>
+	<li> !" Vordergrundfarbe: " <f> s\" 5 <fc> !\" text\" </fc> " !! </f> !" : " 5 <fc> !\" text" </fc> </li>
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
 </presentation>
