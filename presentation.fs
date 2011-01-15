@@ -29,6 +29,7 @@
 	endcase nip
 ;
 
+: typewriter-type ( addr len -- ) over + swap +do 10 ms i @ emit loop ;
 variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
 : ptype-word ( addrw addrc c -- addrc+1 )
 	-rot \ c addrw addrc
@@ -55,9 +56,7 @@ variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurde
 	swap 1+ swap \ lenm lenl+=1 addrw
 ;
 : ptype-anychar ( lenm lenl addrw addrc -- lenm lenl addrw addrc )
-	\ s\" => any char\n" type
 	2over <=
-	\ .s cr
 	if
 		\ lenm lenl addrw addrc
 		rot tuck over swap - \ lenm addrw lenl addrc addrc-lenl \ m w l c c-l
@@ -68,27 +67,21 @@ variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurde
 		else \ Word erst in der naechsten Zeile ausgeben.
 			nip 2dup - negate -rot \ lenm addrc-addrw addrw addrc
 		then
-		cr
+		10 emit
 	then
 	rot 1+ -rot
-	\ .s cr
-	\ s\" <= any char\n" type
 ;
 : ptype' ( addre lenm 0 addrw addre addr -- )
-	\ .s cr
 	\ addre ist fuer die schleife unwichtig
 	+do \ lenm lenl addrw
 		i dup c@ \ lenm lenl addrw addrc c
 		clearwspace
-		\ s\" loop>\n" type .s cr
 		case \ lenm lenl addrw addrc c
 		10 of ptype-newline endof
 		32 of ptype-space endof
 		drop ptype-anychar
 		endcase
-		\ .s cr
 	loop \ addre lenm lenl addrw
-	\ .s cr
 	over ptype-lenl !
 	nip nip tuck - type
 ;

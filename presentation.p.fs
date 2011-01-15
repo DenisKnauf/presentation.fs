@@ -8,7 +8,7 @@
 	<p>
 		!" Natuerlich Text: " <f> s\" !\" Irgend ein Text\"" !! </f>
 		<br>
-		!" (Manchmal ist '" <f> s\" s\" Etwa wenn man !\" erklaeren zu wollen\" !!" !! </f> !" ' noetig)"
+		!" (Manchmal ist '" <f> s\" s\" Etwa wenn man !\" erklaeren will\" !!" !! </f> !" ' noetig)"
 	</p>
 ;
 : p4-2
