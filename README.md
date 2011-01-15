@@ -8,10 +8,10 @@ Benutzen
 
 ./presentation.fs presentation.p.fs
 
-n \ naechste Seite
-p \ Seite zueueck
-u \ Seite aktualisieren (warum auch immer)
-3 g \ Zur dritten Seite springen
-3 n \ 3 Seiten vor springen
+  n \ naechste Seite
+  p \ Seite zueueck
+  u \ Seite aktualisieren (warum auch immer)
+  3 g \ Zur dritten Seite springen
+  3 n \ 3 Seiten vor springen
 
 In der Presentation wird gezeigt, was man alles machen kann.
