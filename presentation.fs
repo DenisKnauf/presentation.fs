@@ -161,20 +161,19 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! ;
 
 variable enumerationCount ( -- addr )
-: {||}  ( addr -- addr )
-        enumerationCount @ 1+ enumerationCount !
-        s"   " type enumerationCount @ 0 U.R s" ) " type
+: {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
+        enumerationCount dup @ 1+ dup rot !
+        s"   " type 0 U.R s" ) " type
 	5 ptype-lenl !
-        cell+
 ;
-: <||>  ( -- addr u0 , xt-{||} 0 ) ['] {||} , here 0 , 0 ;
+: <||>  ( -- , xt-{||} 0 ) ['] {||} ,  ;
 : {/||} ( addr -- addr ) cr ;
-: </||> ( addr len -- , xt-{/||} ) ['] {/||} , swap ! ;
+: </||> ( -- , xt-{/||} ) ['] {/||} , ;
 
-: {en}  ( -- )  ;
-: <en>  ( -- , xt-{en} )  ['] {en} , ;
+: {en}  ( -- )  0 enumerationCount ! ;   \ resets enumeration count
+: <en>  ( -- , xt-{en}  )  ['] {en} , ;
 : {/en} ( -- ) ;
-: </en> ( -- , xt-{/en} ) ['] {en} , ;
+: </en> ( -- , xt-{/en} )  ['] {en} , ;
 
 
 : {np} ( -- )
