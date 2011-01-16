@@ -26,17 +26,17 @@
 	<li> <f> s\" <u> !\" Unterstrichen\" </u>" !! </f> !" : " <u> !" Unterstrichen" </u> </li>
 ;
 
-: farbendemo
-	0 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	1 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	2 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	3 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	4 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	5 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	6 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ====" <br>
-	7 <bc> 0 <fc> !" ====" 1 <fc> !" ====" 2 <fc> !" ====" 3 <fc> !" ====" 4 <fc> !" ====" 5 <fc> !" ====" 6 <fc> !" ====" 7 <fc> !" ===="
-	</bc> </fc>
-;
+: farbendemo'' <fc> !" ====" ;
+: farbendemo'
+	7 0 +do
+		i postpone literal postpone <bc>
+		7 0 +do
+			i postpone literal postpone farbendemo''
+		loop
+		postpone <br>
+	loop
+; immediate
+: farbendemo   farbendemo' </bc> </fc> ;
 
 <presentation>
 	<h> !" Dies ist eine Testpraesentation!" </h>

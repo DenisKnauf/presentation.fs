@@ -31,9 +31,12 @@
 
 : typewriter-type ( addr len -- ) over + swap +do 10 ms i @ emit loop ;
 variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
+
+defer ptype-type
+' type is ptype-type
 : ptype-word ( addrw addrc c -- addrc+1 )
 	-rot \ c addrw addrc
-	dup -rot over - type \ c addrc
+	dup -rot over - ptype-type \ c addrc
 	swap emit 1+ \ addrc+1
 ;
 : ptype-init ( addr len lenm lenl -- addre lenm lenl addrw addre addr )
@@ -63,7 +66,7 @@ variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurde
 		2over drop >= \ lenm addrw lenl addrc addrc-lenl>=addrw
 		if \ Wort ist laenger als eine Zeile -> muss umgebrochen werden.
 			1- -rot 1- -rot 2dup - \ lenm lenl addrc-1 addrw addrc-1-addrw
-			type ." -" nip 1 swap dup \ lenm lenl addrw=addrc-1 addrc-1
+			ptype-type ." -" nip 1 swap dup \ lenm lenl addrw=addrc-1 addrc-1
 		else \ Word erst in der naechsten Zeile ausgeben.
 			nip 2dup - negate -rot \ lenm addrc-addrw addrw addrc
 		then
@@ -120,6 +123,9 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : </bc> ( -- ) ['] {/bc} , ;
 : {br}  ( addr -- addr ) cr ptype-reset ;
 : <br>  ( -- , xt-{br} ) ['] {br} , ;
+\ : {animation}  ( addr -- addr ) cell+ @ is ptype-type ;
+\ : <animation>  ( -- addr u- , xt-{animation} 0 ) ['] {animation} , ' , ;
+\ : </animation> ( -- ) ['] {/animation} , ;
 \ Es folgen ein paar blockorientierte Kennzeichnungen.
 : {h}   ( addr , len -- addr )
 	cr
