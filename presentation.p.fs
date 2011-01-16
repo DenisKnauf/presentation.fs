@@ -38,6 +38,41 @@
 ; immediate
 : farbendemo   farbendemo' </bc> </fc> ;
 
+256 Constant max-line
+Create line-buffer  max-line 2 + allot
+
+0 Value fd-in
+: open-input ( addr u -- )  r/o open-file throw to fd-in ;
+
+: printsource ( from to addr u -- )
+   open-input
+   cr
+   0
+   begin
+      1+
+      line-buffer max-line fd-in read-line throw
+   while
+	swap 2over rot swap over >= if
+		swap over <= if
+      			dup 0 U.R s" -> " type swap line-buffer swap type cr
+		else swap drop
+		endif
+        else swap drop swap drop
+	endif
+   repeat 
+   2drop 2drop 
+   fd-in close-file throw ;
+
+: printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
+  swap 2dup type 2swap \ s" (" type 0 U.R  s" -" type 0 U.R  s" ): " type cr cr type ;
+  swap 2swap cr printsource cr ; \ type emit emit ;
+
+: {source}  ( -- ) ;   
+: <source>  ( -- , xt-{source}  )  ['] {source} , ;
+: {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+: </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
+
 <presentation>
 	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
@@ -46,9 +81,9 @@
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
 	</p>
 	<p> <en>
-		<||> !" erstens"  </||> 
-		<||> !" zweitens" </||> 
-		<||> !" dann"     </||> 
+                <||> !" Forth eignet sich gut für Domain specific languages."  </||> 
+		<||> !" Makros sind ein Heidenspass." </||> 
+		<||> !" Execution tokens erzeugen unseren Code."     </||> 
 	</en> </p>
 <np>
 	<h> !" Ergebnis" </h>
@@ -69,4 +104,8 @@
 	<li> !" Vordergrundfarbe: " <f> s\" Brown <fc> !\" text\" </fc> " !! </f> !" : " Brown <fc> !\" text" </fc> </li>
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
+<np>
+	<h> !" Und Source" </h>
+	<br>
+	<source> s" presentation.fs" 10 20 </source>
 </presentation>
