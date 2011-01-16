@@ -29,9 +29,17 @@
 	endcase nip
 ;
 
-: typewriter-type ( addr len -- ) over + swap +do 10 ms i @ emit loop ;
-variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
+variable typewriter-delay
+: typewriter-type ( addr len -- )
+	typewriter-delay @ -rot
+	over + swap +do
+		dup ms i @ emit
+	loop
+	drop
+;
+50 typewriter-delay !
 
+variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
 defer ptype-type
 ' type is ptype-type
 : ptype-word ( addrw addrc c -- addrc+1 )
@@ -49,7 +57,6 @@ defer ptype-type
 )
 ;
 : ptype-newline ( lenm lenl addrw addrc -- lenm 0 addrw )
-	\ s\" is a newline\n" type
 	10 ptype-word \ lenm lenl addrw=addrc+1
 	nip 0 swap \ lenm lenl=0 addrw
 ;
@@ -86,7 +93,7 @@ defer ptype-type
 		endcase
 	loop \ addre lenm lenl addrw
 	over ptype-lenl !
-	nip nip tuck - type
+	nip nip tuck - ptype-type
 ;
 : ptype ( addr len -- ) term-width ptype-lenl @ ptype-init ptype' ;
 : ptype-reset ( -- ) 0 ptype-lenl ! ;
@@ -123,9 +130,12 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : </bc> ( -- ) ['] {/bc} , ;
 : {br}  ( addr -- addr ) cr ptype-reset ;
 : <br>  ( -- , xt-{br} ) ['] {br} , ;
-\ : {animation}  ( addr -- addr ) cell+ @ is ptype-type ;
-\ : <animation>  ( -- addr u- , xt-{animation} 0 ) ['] {animation} , ' , ;
-\ : </animation> ( -- ) ['] {/animation} , ;
+: {animation}  ( addr , xt -- addr ) dup @ ['] ptype-type defer! cell+ ;
+: <animation>  ( xt -- addr u- , xt-{animation} xt ) ['] {animation} , , ;
+: {/animation} ( addr -- addr ) ['] type is ptype-type ;
+: </animation> ( -- , xt-{/animation} ) ['] {/animation} , ;
+: <tw>  ( -- , xt xt ) ['] typewriter-type <animation> ;
+: </tw> ( -- , xt ) </animation> ;
 \ Es folgen ein paar blockorientierte Kennzeichnungen.
 : {h}   ( addr , len -- addr )
 	cr

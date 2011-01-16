@@ -41,19 +41,15 @@
 <presentation>
 	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
-		!" Eines Tages hatten wir [" <b> !" Harald Steinlechner" </b>
-		!"  und " <b> !" Denis Knauf" </b>
+		!" Eines Tages hatten wir [" <b> <tw> !" Harald Steinlechner" </tw> </b>
+		!"  und " <b> <tw> !" Denis Knauf" </tw> </b>
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
-		<br>
-		<br>	
-		<b>	
-		<en>
-                <||> !" erstens"  </||> 
+	</p>
+	<en>
+		<||> !" erstens"  </||> 
 		<||> !" zweitens" </||> 
 		<||> !" dann"     </||> 
-		</en>
-		</b>
-	</p>
+	</en>
 <np>
 	<h> !" Ergebnis" </h>
 	<p> <b> !" Das hier" </b> </p>
