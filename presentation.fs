@@ -11,12 +11,44 @@
 \ 2-rot ist bei gforth anscheinend nicht definiert
 : 2-rot { a1 a2 b1 b2 c1 c2 } c1 c2 a1 a2 b1 b2 ;
 
+needs ansi.fs
+
+\ at-xy? war mal bestandteil von gforth:
+\ http://www.complang.tuwien.ac.at/cvsweb/cgi-bin/cvsweb/gforth/contrib/ansi.fs?rev=1.1;hideattic=0
+: read-cdnumber  ( c - n | read a numeric entry delimited by character c)
+	>r 0 begin
+		key dup r@ -
+		while
+		swap 10 * swap [char] 0 - +
+	repeat
+	r> 2drop
+;
+: at-xy?  ( -- x y | return the current cursor coordinates)
+	ESC[ ." 6n"
+	key drop key drop  \ <esc> [
+	[char] ; read-cdnumber [char] R read-cdnumber
+	1- swap 1-
+;
+
+: escape ( -- addr len ) s\" \e" ;
+: csi ( -- addr len ) s\" \e[" ;
+: sgr ( u -- ) csi type 0 .r [char] m emit ;
 : term-size form ;
 : term-height ( -- i ) term-size drop ;
 : term-width ( -- i ) term-size nip ;
+: cursor@ ( -- x y ) at-xy? ;
+: cursor! ( x y -- ) at-xy ;
+: cursorx@ ( -- x ) cursor@ drop ;
+: cursory@ ( -- y ) cursor@ nip ;
+: cursorx! ( x -- ) cursory@ cursor! ;
+: cursory! ( x -- ) cursorx@ swap cursor! ;
+: cursor^ ( i -- ) ESC[ 0 .r ." A" ;
+: cursor_ ( i -- ) ESC[ 0 .r ." B" ;
+: cursor> ( i -- ) ESC[ 0 .r ." C" ;
+: cursor< ( i -- ) ESC[ 0 .r ." D" ;
 
 : isnewline? ( c -- i ) dup 10 = swap 13 = or ;
-: isspace?   ( c -- i ) dup 9 = over 11 = or swap 32 = or ;
+: isspace?   ( c -- i ) dup  9 = over 11 = or swap 32 = or ;
 : anyspaces? ( c -- i ) dup isnewline? isspace? or ;
 
 : clearwspace ( c -- c )
@@ -38,6 +70,17 @@ variable typewriter-delay
 	drop
 ;
 50 typewriter-delay !
+
+variable scroll-delay
+: scroll-type ( addr len -- )
+	term-width over - dup cursorx@ - swap cursorx!
+	-rot 2dup type scroll-delay @ ms dup 1 + cursor< 2dup type s"   " type
+	rot scroll-delay @ swap 1 +do
+		dup ms -rot dup 2 + cursor< 2dup type s"  " type rot
+	loop
+	2drop drop
+;
+1 scroll-delay !
 
 variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
 defer ptype-type
@@ -61,7 +104,6 @@ defer ptype-type
 	nip 0 swap \ lenm lenl=0 addrw
 ;
 : ptype-space ( lenm lenl addrw addrc -- lenm lenl1 addrw )
-	\ s\" is a space\n" type
 	32 ptype-word \ lenm lenl addrw=addrc+1
 	swap 1+ swap \ lenm lenl+=1 addrw
 ;
@@ -99,9 +141,6 @@ defer ptype-type
 : ptype-reset ( -- ) 0 ptype-lenl ! ;
 ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 
-: escape ( -- addr len ) s\" \e" ;
-: csi ( -- addr len ) s\" \e[" ;
-: sgr ( u -- ) csi type 0 0 d.r 109 ( m ) emit ;
 : beep
 	0 term-height 2 - at-xy
 	7 emit s" *beep* not" type
@@ -136,6 +175,8 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : </animation> ( -- , xt-{/animation} ) ['] {/animation} , ;
 : <tw>  ( -- , xt xt ) ['] typewriter-type <animation> ;
 : </tw> ( -- , xt ) </animation> ;
+: <scroll>  ( -- , xt xt ) ['] scroll-type <animation> ;
+: </scroll> ( -- , xt ) </animation> ;
 \ Es folgen ein paar blockorientierte Kennzeichnungen.
 : {h}   ( addr , len -- addr )
 	cr

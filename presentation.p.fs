@@ -1,6 +1,6 @@
 
 \ Haeufig benutzte Textauszeichnungen:
-: <f> <b> 4 <fc> ;
+: <f> <b> Blue <fc> ;
 : </f> </fc> </b> ;
 
 : p4-1
@@ -45,11 +45,11 @@
 		!"  und " <b> <tw> !" Denis Knauf" </tw> </b>
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
 	</p>
-	<en>
+	<p> <en>
 		<||> !" erstens"  </||> 
 		<||> !" zweitens" </||> 
 		<||> !" dann"     </||> 
-	</en>
+	</en> </p>
 <np>
 	<h> !" Ergebnis" </h>
 	<p> <b> !" Das hier" </b> </p>
@@ -65,8 +65,8 @@
 <np>
 	<h> !" Und Farben" </h>
 	<br>
-	<li> !" Hintergrundfarbe: " <f> s\" 3 <bc> !\" text\" </bc> " !! </f> !" : " 3 <bc> !\" text" </bc> </li>
-	<li> !" Vordergrundfarbe: " <f> s\" 5 <fc> !\" text\" </fc> " !! </f> !" : " 5 <fc> !\" text" </fc> </li>
+	<li> !" Hintergrundfarbe: " <f> s\" Yellow <bc> !\" text\" </bc> " !! </f> !" : " Yellow <bc> !\" text" </bc> </li>
+	<li> !" Vordergrundfarbe: " <f> s\" Brown <fc> !\" text\" </fc> " !! </f> !" : " Brown <fc> !\" text" </fc> </li>
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
 </presentation>
