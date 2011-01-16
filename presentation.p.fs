@@ -44,6 +44,15 @@
 		!" Eines Tages hatten wir [" <b> !" Harald Steinlechner" </b>
 		!"  und " <b> !" Denis Knauf" </b>
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
+		<br>
+		<br>	
+		<b>	
+		<en>
+                <||> !" erstens"  </||> 
+		<||> !" zweitens" </||> 
+		<||> !" dann"     </||> 
+		</en>
+		</b>
 	</p>
 <np>
 	<h> !" Ergebnis" </h>

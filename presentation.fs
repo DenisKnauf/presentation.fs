@@ -160,6 +160,23 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : {/li} ( addr -- addr ) cr ;
 : </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! ;
 
+variable enumerationCount ( -- addr )
+: {||}  ( addr -- addr )
+        enumerationCount @ 1+ enumerationCount !
+        s"   " type enumerationCount @ 0 U.R s" ) " type
+	5 ptype-lenl !
+        cell+
+;
+: <||>  ( -- addr u0 , xt-{||} 0 ) ['] {||} , here 0 , 0 ;
+: {/||} ( addr -- addr ) cr ;
+: </||> ( addr len -- , xt-{/||} ) ['] {/||} , swap ! ;
+
+: {en}  ( -- )  ;
+: <en>  ( -- , xt-{en} )  ['] {en} , ;
+: {/en} ( -- ) ;
+: </en> ( -- , xt-{/en} ) ['] {en} , ;
+
+
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
 	page \ Bildschirm leeren
