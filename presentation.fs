@@ -24,7 +24,7 @@ needs ansi.fs
 
 : escape ( -- addr len ) s\" \e" ;
 : csi ( -- addr len ) s\" \e[" ;
-: sgr ( u -- ) csi type 0 .r [char] m emit ;
+: sgr ( u -- ) ESC[ 0 .r [char] m emit ;
 : term-size form ;
 : term-height ( -- i ) term-size drop ;
 : term-width ( -- i ) term-size nip ;
@@ -34,11 +34,14 @@ needs ansi.fs
 : cursory@ ( -- y ) cursor@ nip ;
 : cursorx! ( x -- ) cursory@ cursor! ;
 : cursory! ( x -- ) cursorx@ swap cursor! ;
+
 : cursor' ( i c -- ) swap dup if ESC[ 0 .r emit else 2drop then ;
 : cursor^ ( i -- ) [char] A cursor' ;
 : cursor_ ( i -- ) [char] B cursor' ;
 : cursor> ( i -- ) [char] C cursor' ;
 : cursor< ( i -- ) [char] D cursor' ;
+: screen^ ( i -- ) [char] S cursor' ;
+: screen_ ( i -- ) [char] T cursor' ;
 
 : isnewline? ( c -- i ) dup 10 = swap 13 = or ;
 : isspace?   ( c -- i ) dup  9 = over 11 = or swap 32 = or ;
@@ -165,7 +168,7 @@ ptype-reset
 : {h}   ( addr , len -- addr )
 	cr
 	term-width over @ - 2 / \ addr width-twidth/2
-	dup cursor> ptype-indent !
+	cursor>
 	cell+ {b}
 ; \ header
 : <h>   ( -- addr 0 , xt-{h} 0 )  ['] {h}  , here 0 , 0 ;
@@ -208,13 +211,48 @@ variable enumerationCount ( -- addr )
 : {/en} ( -- ) ptype-reset ;
 : </en> ( -- , xt-{/en} )  ['] {en} , ;
 
+256 Constant max-line
+Create line-buffer  max-line 2 + allot
+
+0 Value fd-in
+: open-input ( addr u -- )  r/o open-file throw to fd-in ;
+
+: printsource ( from to addr u -- )
+   open-input
+   cr
+   0
+   begin
+      1+
+      line-buffer max-line fd-in read-line throw
+   while
+	swap 2over rot swap over >= if
+		swap over <= if
+      			dup 0 U.R s" -> " type swap line-buffer swap type cr
+		else swap drop
+		endif
+        else swap drop swap drop
+	endif
+   repeat 
+   2drop 2drop 
+   fd-in close-file throw ;
+
+: printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
+  swap 2dup type 2swap \ s" (" type 0 U.R  s" -" type 0 U.R  s" ): " type cr cr type ;
+  swap 2swap cr printsource cr ; \ type emit emit ;
+
+: {source}  ( -- ) ;   
+: <source>  ( -- , xt-{source}  )  ['] {source} , ;
+: {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+: </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
+
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
 	page \ Bildschirm leeren
 ;
 : {/np} ( -- )
 	\ 30 sgr 40 sgr
-	0 term-height 2 - at-xy
+	0 term-height dup cursory@ - 2 / screen_ 2 - cursor!
 ;
 : <np> ( -- addr , xt-{/np} xt-{np} )
 	\ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge)
