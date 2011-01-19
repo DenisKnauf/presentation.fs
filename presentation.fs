@@ -1,12 +1,4 @@
 #! /usr/bin/gforth
-\ here-allokation wird als fifo verwendet.
-: copy ( addrdst addrsrc len -- addrdstend )
-	over ( dst src len src ) + swap ( dst end src )
-	+do ( dst+ )
-		i ( dst+ src+ ) c@ ( dst+ chr )
-		over ( dst+ chr dst+ ) c! ( dst+ ) 1+
-	loop
-;
 
 \ 2-rot ist bei gforth anscheinend nicht definiert
 : 2-rot { a1 a2 b1 b2 c1 c2 } c1 c2 a1 a2 b1 b2 ;
@@ -42,10 +34,11 @@ needs ansi.fs
 : cursory@ ( -- y ) cursor@ nip ;
 : cursorx! ( x -- ) cursory@ cursor! ;
 : cursory! ( x -- ) cursorx@ swap cursor! ;
-: cursor^ ( i -- ) ESC[ 0 .r ." A" ;
-: cursor_ ( i -- ) ESC[ 0 .r ." B" ;
-: cursor> ( i -- ) ESC[ 0 .r ." C" ;
-: cursor< ( i -- ) ESC[ 0 .r ." D" ;
+: cursor' ( i c -- ) swap dup if ESC[ 0 .r emit else 2drop then ;
+: cursor^ ( i -- ) [char] A cursor' ;
+: cursor_ ( i -- ) [char] B cursor' ;
+: cursor> ( i -- ) [char] C cursor' ;
+: cursor< ( i -- ) [char] D cursor' ;
 
 : isnewline? ( c -- i ) dup 10 = swap 13 = or ;
 : isspace?   ( c -- i ) dup  9 = over 11 = or swap 32 = or ;
@@ -82,7 +75,7 @@ variable scroll-delay
 ;
 1 scroll-delay !
 
-variable ptype-lenl \ Wieviele Zeichen bereits in dieser Zeile geschrieben wurden
+variable ptype-indent \ Zeile Einruecken
 defer ptype-type
 ' type is ptype-type
 : ptype-word ( addrw addrc c -- addrc+1 )
@@ -90,18 +83,12 @@ defer ptype-type
 	dup -rot over - ptype-type \ c addrc
 	swap emit 1+ \ addrc+1
 ;
-: ptype-init ( addr len lenm lenl -- addre lenm lenl addrw addre addr )
-	{ addr len lenm lenl }  addr len +  lenm  lenl  addr  addr len +  addr
-(	2over + \ addr len lenm lenl addre
-	rot swap tuck 2-rot \ addre lenm addr len lenl addre
-	2over drop rot swap \ addre lenm addr len addre lenl addr
-	dup -rot 2-rot \ addre lenm lenl addrw addr len addre addr
-	2nip \ addre lenm lenl addrw addre addr
-)
+: ptype-init ( addr len lenm x -- addre lenm lenl addrw addre addr )
+	{ addr len lenm x }  addr len +  lenm  x dup cursorx! addr  addr len +  addr
 ;
-: ptype-newline ( lenm lenl addrw addrc -- lenm 0 addrw )
+: ptype-newline ( lenm lenl addrw addrc -- lenm lenl addrw )
 	10 ptype-word \ lenm lenl addrw=addrc+1
-	nip 0 swap \ lenm lenl=0 addrw
+	ptype-indent @ dup cursor> swap \ lenm lenl0 addrw
 ;
 : ptype-space ( lenm lenl addrw addrc -- lenm lenl1 addrw )
 	32 ptype-word \ lenm lenl addrw=addrc+1
@@ -111,19 +98,20 @@ defer ptype-type
 	2over <=
 	if
 		\ lenm lenl addrw addrc
-		rot tuck over swap - \ lenm addrw lenl addrc addrc-lenl \ m w l c c-l
+		rot tuck over swap - \ lenm addrw lenl addrc addrc-lenl
 		2over drop >= \ lenm addrw lenl addrc addrc-lenl>=addrw
 		if \ Wort ist laenger als eine Zeile -> muss umgebrochen werden.
 			1- -rot 1- -rot 2dup - \ lenm lenl addrc-1 addrw addrc-1-addrw
 			ptype-type ." -" nip 1 swap dup \ lenm lenl addrw=addrc-1 addrc-1
-		else \ Word erst in der naechsten Zeile ausgeben.
+		else \ Wort erst in der naechsten Zeile ausgeben.
 			nip 2dup - negate -rot \ lenm addrc-addrw addrw addrc
 		then
-		10 emit
+		cr
+		rot ptype-indent @ dup cursor> + -rot
 	then
 	rot 1+ -rot
 ;
-: ptype' ( addre lenm 0 addrw addre addr -- )
+: ptype' ( addre lenm lenl addrw addre addr -- )
 	\ addre ist fuer die schleife unwichtig
 	+do \ lenm lenl addrw
 		i dup c@ \ lenm lenl addrw addrc c
@@ -131,20 +119,16 @@ defer ptype-type
 		case \ lenm lenl addrw addrc c
 		10 of ptype-newline endof
 		32 of ptype-space endof
-		drop ptype-anychar
+			drop ptype-anychar
 		endcase
 	loop \ addre lenm lenl addrw
-	over ptype-lenl !
 	nip nip tuck - ptype-type
 ;
-: ptype ( addr len -- ) term-width ptype-lenl @ ptype-init ptype' ;
-: ptype-reset ( -- ) 0 ptype-lenl ! ;
-ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
+: ptype ( addr len -- ) term-width 1- cursorx@ ptype-init ptype' ;
+: ptype-reset ( -- ) 0 ptype-indent ! ; \ Nicht einruecken
+ptype-reset
 
-: beep
-	0 term-height 2 - at-xy
-	7 emit s" *beep* not" type
-;
+: beep 0 term-height 2 - cursor! 7 emit s" *beep* not" type ;
 
 \ Es folgen ein paar syntaktische Textauszeichnungen.
 : {i}   ( addr -- addr )  7 sgr ;
@@ -181,21 +165,17 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : {h}   ( addr , len -- addr )
 	cr
 	term-width over @ - 2 / \ addr width-twidth/2
-	dup ptype-lenl !
-	1 +do 32 emit loop
-	cell+
-	{b}
+	dup cursor> ptype-indent !
+	cell+ {b}
 ; \ header
 : <h>   ( -- addr 0 , xt-{h} 0 )  ['] {h}  , here 0 , 0 ;
 : {/h}  ( addr , len -- addr1 )
-	{/b}
+	{/b} cursorx@ 1+ \ addr x
 	cr
-	term-width over @ - 2 / \ addr width-twidth/2
-	dup
-	2 +do 32 emit loop
-	ptype-lenl @ swap 2 - +do 61 ( = ) emit loop
-	cr
-	cell+
+	over @ term-width swap - 2 / 1- \ addr x indent
+	cursor> \ addr x
+	cursorx@ +do ." =" loop \ addr
+	cr cell+
 ;
 : </h>  ( addr len -- , xt-{/h} len0 ) ['] {/h} , dup , swap ! ;
 : {p}   ( addr -- addr ) cr ptype-reset cell+ ; \ paragraph
@@ -203,8 +183,8 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 : {/p}  ( addr -- addr ) cr ;
 : </p>  ( addr len -- , xt-{/p} ) ['] {/p} , swap ! ;
 : {li}  ( addr -- addr )
-	s\"   * " type
-	4 ptype-lenl !
+	2 cursor> space 1 cursor>
+	6 ptype-indent !
 	cell+
 ;
 : <li>  ( -- addr u0 , xt-{li} 0 ) ['] {li} , here 0 , 0 ;
@@ -213,19 +193,20 @@ ptype-reset \ ptype-lenl sollte von Anfang an 0 sein
 
 variable enumerationCount ( -- addr )
 : {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
-        enumerationCount dup @ 1+ dup rot !
-        s"   " type 0 U.R s" ) " type
-	5 ptype-lenl !
+	enumerationCount dup @ 1+ dup rot !
+	2 cursor> 0 U.R ." ." 1 cursor>
 ;
-: <||>  ( -- , xt-{||} 0 ) ['] {||} ,  ;
+: <||>  ( -- , xt-{||} 0 ) ['] {||} , ;
 : {/||} ( addr -- addr ) cr ;
 : </||> ( -- , xt-{/||} ) ['] {/||} , ;
 
-: {en}  ( -- )  0 enumerationCount ! ;   \ resets enumeration count
+: {en}  ( -- )
+	5 ptype-indent ! \ 6 Zeichen weit einruecken
+	0 enumerationCount ! \ resets enumeration count
+;
 : <en>  ( -- , xt-{en}  )  ['] {en} , ;
-: {/en} ( -- ) ;
+: {/en} ( -- ) ptype-reset ;
 : </en> ( -- , xt-{/en} )  ['] {en} , ;
-
 
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen

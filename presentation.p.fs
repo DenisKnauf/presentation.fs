@@ -54,7 +54,7 @@ Create line-buffer  max-line 2 + allot
    while
 	swap 2over rot swap over >= if
 		swap over <= if
-      			dup 0 U.R s" -> " type swap line-buffer swap type cr
+      			dup 0 U.R s" -> " ptype-type swap line-buffer swap ptype-type {br}
 		else swap drop
 		endif
         else swap drop swap drop
@@ -76,15 +76,15 @@ Create line-buffer  max-line 2 + allot
 <presentation>
 	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
-		!" Eines Tages hatten wir [" <b> <tw> !" Harald Steinlechner" </tw> </b>
-		!"  und " <b> <tw> !" Denis Knauf" </tw> </b>
+		!" Eines Tages hatten wir [" ( <b> <tw> ) !" Harald Steinlechner" </tw> </b>
+		!"  und " ( <b> <tw> ) !" Denis Knauf" </tw> </b>
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
 	</p>
-	<p> <en>
-                <||> !" Forth eignet sich gut für Domain specific languages."  </||> 
-		<||> !" Makros sind ein Heidenspass." </||> 
-		<||> !" Execution tokens erzeugen unseren Code."     </||> 
-	</en> </p>
+	\ <p> <en>
+		\ <||> !" Forth eignet sich gut für Domain specific languages."  </||> 
+		\ <||> !" Makros sind ein Heidenspass." </||> 
+		\ <||> !" Execution tokens erzeugen unseren Code. text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text" </||> 
+	\ </en> </p>
 <np>
 	<h> !" Ergebnis" </h>
 	<p> <b> !" Das hier" </b> </p>
