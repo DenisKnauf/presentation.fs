@@ -43,9 +43,10 @@
 	<p>
 		!" Eines Tages hatten wir [Harald Steinlechner und Denis Knauf"
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
+		!" text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"
 	</p>
 	\ <p> <en>
-		\ <||> !" Forth eignet sich gut für Domain specific languages."  </||> 
+		\ <||> !" Forth eignet sich gut für Domain specific languages." </||> 
 		\ <||> !" Makros sind ein Heidenspass." </||> 
 		\ <||> !" Execution tokens erzeugen unseren Code. text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text" </||> 
 	\ </en> </p>
@@ -71,5 +72,5 @@
 <np>
 	<h> !" Und Source" </h>
 	<br>
-	<source> s" presentation.fs" 10 20 </source>
+	<source> s" presentation.fs" 0 20 </source>
 </presentation>

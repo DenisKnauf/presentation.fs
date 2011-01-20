@@ -1,5 +1,10 @@
 #! /usr/bin/gforth
 
+\ variable cr-count
+\ : cr cr cr-count dup @ 1+ swap ! ;
+\ : cr-reset 0 cr-count ! ;
+\ : page page cr-reset ;
+
 \ 2-rot ist bei gforth anscheinend nicht definiert
 : 2-rot { a1 a2 b1 b2 c1 c2 } c1 c2 a1 a2 b1 b2 ;
 
@@ -35,7 +40,7 @@ needs ansi.fs
 : cursorx! ( x -- ) cursory@ cursor! ;
 : cursory! ( x -- ) cursorx@ swap cursor! ;
 
-: cursor' ( i c -- ) swap dup if ESC[ 0 .r emit else 2drop then ;
+: cursor' ( i c -- ) swap dup if ESC[ 0 u.r emit else 2drop then ;
 : cursor^ ( i -- ) [char] A cursor' ;
 : cursor_ ( i -- ) [char] B cursor' ;
 : cursor> ( i -- ) [char] C cursor' ;
@@ -79,6 +84,9 @@ variable scroll-delay
 1 scroll-delay !
 
 variable ptype-indent \ Zeile Einruecken
+variable ptype-curx \ cursorx@-emulation durch zaehlen.
+: ptype-cursorx@ ( -- i ) ptype-curx @ ;
+: ptype-curx@! ( -- ) cursorx@ ptype-curx ! ;
 defer ptype-type
 ' type is ptype-type
 : ptype-word ( addrw addrc c -- addrc+1 )
@@ -87,7 +95,12 @@ defer ptype-type
 	swap emit 1+ \ addrc+1
 ;
 : ptype-init ( addr len lenm x -- addre lenm lenl addrw addre addr )
-	{ addr len lenm x }  addr len +  lenm  x dup cursorx! addr  addr len +  addr
+	dup ptype-indent @ \ addr len lenm x x indent
+	swap - \ addr len lenm x indent-x
+	dup 0>= if
+		cursor> drop ptype-indent @
+	else drop then
+	{ addr len lenm x }  addr len +  lenm  x  addr  addr len +  addr
 ;
 : ptype-newline ( lenm lenl addrw addrc -- lenm lenl addrw )
 	10 ptype-word \ lenm lenl addrw=addrc+1
@@ -125,10 +138,13 @@ defer ptype-type
 			drop ptype-anychar
 		endcase
 	loop \ addre lenm lenl addrw
-	nip nip tuck - ptype-type
+	swap ptype-curx ! nip tuck - ptype-type
 ;
-: ptype ( addr len -- ) term-width 1- cursorx@ ptype-init ptype' ;
-: ptype-reset ( -- ) 0 ptype-indent ! ; \ Nicht einruecken
+: ptype ( addr len -- ) term-width 1- ptype-cursorx@ ptype-init ptype' ;
+: ptype-reset ( -- )
+	0 ptype-indent !
+	0 ptype-curx !
+; \ Nicht einruecken
 ptype-reset
 
 : beep 0 term-height 2 - cursor! 7 emit s" *beep* not" type ;
@@ -168,7 +184,7 @@ ptype-reset
 : {h}   ( addr , len -- addr )
 	cr
 	term-width over @ - 2 / \ addr width-twidth/2
-	cursor>
+	dup ptype-curx ! cursor>
 	cell+ {b}
 ; \ header
 : <h>   ( -- addr 0 , xt-{h} 0 )  ['] {h}  , here 0 , 0 ;
@@ -187,7 +203,7 @@ ptype-reset
 : </p>  ( addr len -- , xt-{/p} ) ['] {/p} , swap ! ;
 : {li}  ( addr -- addr )
 	2 cursor> space 1 cursor>
-	6 ptype-indent !
+	6 dup ptype-indent ! ptype-curx !
 	cell+
 ;
 : <li>  ( -- addr u0 , xt-{li} 0 ) ['] {li} , here 0 , 0 ;
@@ -197,7 +213,8 @@ ptype-reset
 variable enumerationCount ( -- addr )
 : {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
 	enumerationCount dup @ 1+ dup rot !
-	2 cursor> 0 U.R ." ." 1 cursor>
+	2 cursor> 0 u.r ." ." 1 cursor>
+	6 dup ptype-indent ! ptype-curx !
 ;
 : <||>  ( -- , xt-{||} 0 ) ['] {||} , ;
 : {/||} ( addr -- addr ) cr ;
@@ -218,27 +235,36 @@ Create line-buffer  max-line 2 + allot
 : open-input ( addr u -- )  r/o open-file throw to fd-in ;
 
 : printsource ( from to addr u -- )
-   open-input
-   cr
-   0
-   begin
-      1+
-      line-buffer max-line fd-in read-line throw
-   while
-	swap 2over rot swap over >= if
-		swap over <= if
-      			dup 0 U.R s" -> " type swap line-buffer swap type cr
-		else swap drop
+	open-input
+	cr
+	0
+	begin
+		1+ line-buffer max-line fd-in read-line throw
+	while
+		swap 2over rot tuck >= if
+			tuck <= if
+				dup 0 <# #s #> \ ... i str l
+				dup ptype-indent @ \ i str l l indent
+				dup ptype-curx ! 1- \ i str l l indent
+				swap - cursor> \ i str l
+				type ." |" \ ... i \ Eingerueckt Zahl ausgeben
+				swap line-buffer swap ptype cr
+			else nip
+			endif
+		else nip nip
 		endif
-        else swap drop swap drop
-	endif
-   repeat 
-   2drop 2drop 
-   fd-in close-file throw ;
+	repeat 
+	2drop 2drop 
+	fd-in close-file throw
+;
 
 : printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
-  swap 2dup type 2swap \ s" (" type 0 U.R  s" -" type 0 U.R  s" ): " type cr cr type ;
-  swap 2swap cr printsource cr ; \ type emit emit ;
+  swap 2swap \ addr namelen end start
+	2dup > if swap then \ addr namelen start/end end/start
+	dup 0 <# #s #> nip ptype-reset 1+ ptype-indent !
+  2swap \ start end addr namelen
+	printsource cr
+;
 
 : {source}  ( -- ) ;   
 : <source>  ( -- , xt-{source}  )  ['] {source} , ;
@@ -252,7 +278,7 @@ Create line-buffer  max-line 2 + allot
 ;
 : {/np} ( -- )
 	\ 30 sgr 40 sgr
-	0 term-height dup cursory@ - 2 / screen_ 2 - cursor!
+	0 term-height dup cursory@ - 2 / dup 0< if drop else screen_ then 2 - cursor!
 ;
 : <np> ( -- addr , xt-{/np} xt-{np} )
 	\ Wir legen jede Anfangsadresse einer Seite auf den Stack (Achtung, in umgekehrter Reihenfolge)
