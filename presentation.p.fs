@@ -41,6 +41,8 @@
 <presentation>
 	<p>
 		<file> s" header.txt" 0 100 </file>
+		<br>
+		\ <b> !" Denis Knauf & Harald Steinlechner" </b>
 	</p>
 <np>
 	<h> </b> !" Dies ist eine Testpraesentation!" </h>
