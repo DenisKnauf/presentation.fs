@@ -40,9 +40,7 @@
 
 <presentation>
 	<p>
-		<tw>
 		<file> s" header.txt" 0 100 </file>
-		</tw>
 		<br>
 		\ <b> !" Denis Knauf & Harald Steinlechner" </b>
 	</p>
@@ -53,8 +51,8 @@
 		<br>
 		!" Die flexible Forth-Syntax erlaubt die deklarative Representation von formatierten Text in Forth."
 		<br>
-		!" Die Präsentation selbst sowie ihre Seiten werden mittels <html> artigen Tags implementiert."
-	</p>
+		!" Die Präsentation selbst sowie ihre Seiten werden mittels <html> artigen Tags implementiert." 
+	</p> 
 <np>
 	<p>
 		<h> !" Grundstruktur " </h>
@@ -119,5 +117,27 @@
 		<source> s" presentation.p.fs" 112 116 </source>
 		<br> !" Die Operatoren sehen so aus:" <br>
 		<source> s" presentation.fs" 214 221 </source>
+	</p>
+<np>	
+	<p> <tw>
+		<h> !" Spezielle (verwendete) Features von Forth" </h>
+		<br> <br>
+		  <li> !" * Compiler VS Interpreter" </li>
+		  <li> !" * Execution Tokens" </li>
+		  <li> !" * Here , ," </li>
+		  <li> !" * Makros" </li>
+	</tw> </p>
+<np>
+	<p>
+		<tw>
+		<file> s" nochFragen.txt" 0 100 </file>
+		</tw>
+	</p>
+<np>
+	<p>
+		<tw>
+		<file> s" danke.txt" 0 100 </file>
+		<b> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </b> <br>
+		</tw>
 	</p>
 </presentation>
