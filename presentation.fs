@@ -218,8 +218,10 @@ Create line-buffer  max-line 2 + allot
 : open-input ( addr u -- )  r/o open-file throw to fd-in ;
 
 : printsource ( from to addr u -- )
+   { showLines }
    open-input
    cr
+   \ showLines 0 U.R
    0
    begin
       1+
@@ -227,7 +229,9 @@ Create line-buffer  max-line 2 + allot
    while
 	swap 2over rot swap over >= if
 		swap over <= if
-      			dup 0 U.R s" -> " type swap line-buffer swap type cr
+      			showLines if dup 0 U.R s" -> " type swap line-buffer swap type cr
+			else swap line-buffer swap type cr
+			endif 
 		else swap drop
 		endif
         else swap drop swap drop
@@ -237,14 +241,21 @@ Create line-buffer  max-line 2 + allot
    fd-in close-file throw ;
 
 : printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
+  { showLines }
   swap 2dup type 2swap \ s" (" type 0 U.R  s" -" type 0 U.R  s" ): " type cr cr type ;
-  swap 2swap cr printsource cr ; \ type emit emit ;
+  swap 2swap cr showLines printsource cr ; \ type emit emit ;
 
 : {source}  ( -- ) ;   
 : <source>  ( -- , xt-{source}  )  ['] {source} , ;
 : {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
-		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+		   @ swap cell 3 * + @ 1 printCodeHeader 4 cells + ;
 : </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
+
+: {file}  ( -- ) ;   
+: <file>  ( -- , xt-{file}  )  ['] {file} , ;
+: {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+		   @ swap cell 3 * + @ 0 printCodeHeader 4 cells + ;
+: </file> ( -- , xt-{/file} )  ['] {/file} , , , , , ;
 
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
