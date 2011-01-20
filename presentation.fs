@@ -272,6 +272,12 @@ Create line-buffer  max-line 2 + allot
 		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
 : </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
 
+: {file}  ( -- ) ;   
+: <file>  ( -- , xt-{file}  )  ['] {file} , ;
+: {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+: </file> ( -- , xt-{/file} )  ['] {/file} , , , , , ;
+
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
 	page \ Bildschirm leeren
