@@ -74,6 +74,7 @@ variable typewriter-delay
 
 variable scroll-delay
 : scroll-type ( addr len -- )
+	dup 1 < if 2drop exit then
 	term-width over - dup cursorx@ - swap cursorx!
 	-rot 2dup type scroll-delay @ ms dup 1 + cursor< 2dup type s"   " type
 	rot scroll-delay @ swap 1 +do
@@ -81,7 +82,7 @@ variable scroll-delay
 	loop
 	2drop drop
 ;
-1 scroll-delay !
+10 scroll-delay !
 
 variable ptype-indent \ Zeile Einruecken
 variable ptype-curx \ cursorx@-emulation durch zaehlen.
@@ -234,7 +235,7 @@ Create line-buffer  max-line 2 + allot
 0 Value fd-in
 : open-input ( addr u -- )  r/o open-file throw to fd-in ;
 
-: printsource ( from to addr u -- )
+: printsource ( from to addr u 1/0 -- )
 	{ showLines }
 	open-input
 	cr
@@ -247,9 +248,11 @@ Create line-buffer  max-line 2 + allot
 				dup 0 <# #s #> \ ... i str l
 				dup ptype-indent @ \ i str l l indent
 				dup ptype-curx ! 1- \ i str l l indent
-				swap - cursor> \ i str l
-				showLines if type ." |" \ ... i  \ Eingerueckt Zahl ausgeben
-					  else 2drop  endif \ Eingerueckt keine Zahl ausgeben
+				swap - dup 0< if drop else cursor> then \ i str l
+				showLines if
+					type ." |" \ ... i  \ Eingerueckt Zahl ausgeben
+				else 2drop \ Eingerueckt keine Zahl ausgeben
+				endif
 				swap line-buffer swap ptype cr
 			else nip
 			endif
@@ -260,11 +263,11 @@ Create line-buffer  max-line 2 + allot
 	fd-in close-file throw
 ;
 
-: printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
+: printCodeHeader ( end start namelen addr 1/0 -- )  \ prints source code header containing line numbers
   { showLines }
   swap 2swap \ addr namelen end start
 	2dup > if swap then \ addr namelen start/end end/start
-	dup 0 <# #s #> nip ptype-reset 1+ ptype-indent !
+	showLines if dup 0 <# #s #> nip else 0 then ptype-reset 1+ ptype-indent !
   2swap \ start end addr namelen
 	showLines printsource cr
 ;
