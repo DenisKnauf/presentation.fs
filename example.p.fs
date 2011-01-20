@@ -1,5 +1,5 @@
 <praesentation>
-	<h> </b> !" Dies ist eine Testpraesentation!" </h>
+	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
 		!" Eines Tages hatten wir [Harald Steinlechner und Denis Knauf"
 		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
