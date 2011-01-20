@@ -66,28 +66,24 @@
 		<br>
 		<br>
 		<li> !" <prasentation>" </li>
-		<li> !" <p>" </li>
-		<li> !" <b>" </li>
+		<li> !" <h>"   </li>
+		<li> !" <p>"  </li>
+		<li> !" <b>"  </li>
 		<li> !" <br>" </li>
+		<br>
+		<li> !\" !\" " </li>
 	</p>
 <np>
-	<h> </b> !" Dies ist eine Testpraesentation!" </h>
 	<p>
-		!" Eines Tages hatten wir [Harald Steinlechner und Denis Knauf"
-		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
-		!" text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"
+		<h> !" Memory layout von <prasentation> " </h>
+		<br>
+		<br>
+		!" Sollten wir das hier beschreiben?"
 	</p>
-	\ <p> <en>
-		\ <||> !" Forth eignet sich gut für Domain specific languages." </||> 
-		\ <||> !" Makros sind ein Heidenspass." </||> 
-		\ <||> !" Execution tokens erzeugen unseren Code. text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text" </||> 
-	\ </en> </p>
 <np>
-	<h> !" Ergebnis" </h>
-	<p> <b> !" Das hier" </b> </p>
-<np>
-	<h> !" hallo" </h>
-	<p> !" Sieht doch garnicht so schlecht aus" </p>
+	<p>
+		<h> !" Wie <prasentation> abgearbeitet wrid" </h>
+	</p>
 <np>
 	p4-1
 <np>
@@ -102,7 +98,24 @@
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
 <np>
-	<h> !" Und Source" </h>
-	<br>
-	<source> s" presentation.fs" 0 20 </source>
+	<p>
+		<h> !" Zeit für Makros!!" </h>
+		<source> s" presentation.p.fs" 29 39 </source>
+		<p> farbendemo </p>
+	</p>
+<np>
+	<p>
+		<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
+		<br> <br>
+		<b> !" So kann man Aufzaehlungen erstellen" </b>
+		<br> <br>
+		<en>
+			<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich" </||>
+			<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth persönlich. " </||>
+			<||> !" Makros generieren Inhalte" </||>
+		</en>
+		<source> s" presentation.p.fs" 112 116 </source>
+		<br> !" Die Operatoren sehen so aus:" <br>
+		<source> s" presentation.fs" 214 221 </source>
+	</p>
 </presentation>
