@@ -235,6 +235,7 @@ Create line-buffer  max-line 2 + allot
 : open-input ( addr u -- )  r/o open-file throw to fd-in ;
 
 : printsource ( from to addr u -- )
+	{ showLines }
 	open-input
 	cr
 	0
@@ -247,7 +248,8 @@ Create line-buffer  max-line 2 + allot
 				dup ptype-indent @ \ i str l l indent
 				dup ptype-curx ! 1- \ i str l l indent
 				swap - cursor> \ i str l
-				type ." |" \ ... i \ Eingerueckt Zahl ausgeben
+				showLines if type ." |" \ ... i  \ Eingerueckt Zahl ausgeben
+					  else 2drop  endif \ Eingerueckt keine Zahl ausgeben
 				swap line-buffer swap ptype cr
 			else nip
 			endif
@@ -259,23 +261,24 @@ Create line-buffer  max-line 2 + allot
 ;
 
 : printCodeHeader ( end start namelen addr -- )  \ prints source code header containing line numbers
+  { showLines }
   swap 2swap \ addr namelen end start
 	2dup > if swap then \ addr namelen start/end end/start
 	dup 0 <# #s #> nip ptype-reset 1+ ptype-indent !
   2swap \ start end addr namelen
-	printsource cr
+	showLines printsource cr
 ;
 
 : {source}  ( -- ) ;   
 : <source>  ( -- , xt-{source}  )  ['] {source} , ;
 : {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
-		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+		   @ swap cell 3 * + @ 1 printCodeHeader 4 cells + ;
 : </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
 
 : {file}  ( -- ) ;   
 : <file>  ( -- , xt-{file}  )  ['] {file} , ;
 : {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
-		   @ swap cell 3 * + @ printCodeHeader 4 cells + ;
+		   @ swap cell 3 * + @ 0 printCodeHeader 4 cells + ;
 : </file> ( -- , xt-{/file} )  ['] {/file} , , , , , ;
 
 : {np} ( -- )
