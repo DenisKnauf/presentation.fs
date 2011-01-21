@@ -46,32 +46,27 @@
 		71 <->
 		1 <|> !"  Speicheraufbau" 18 <|> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! 56 <|> s\"  here-\"stack\"" !! 71 <|>
 		<br>
-		1 <|> <b> a b </b> !! 18 <|> <b> c d !! </b> 56 <|> 71 <|>
+		1 <|> a b <b> !! </b> 18 <|> c d <b> !! </b> 56 <|> 71 <|>
 		71 <->
 	</p>
 ;
 
 <presentation>
-	<p>
-		<file> s" header.txt" 0 100 </file>
-		<br>
-		\ <b> !" Denis Knauf & Harald Steinlechner" </b>
-	</p>
+	<p> s" header.txt" 0 100 <file> </p>
 <np>
-	<h> !" Präsentationssoftware in Forth" </h>
+	<h> !" Präsentationssoftware in Forth -- <sprache> </sprache>" </h>
 	<p>
-		<br>
-		<br>
 		!" Die flexible Forth-Syntax erlaubt die deklarative Representation von formatierten Text in Forth."
-		<br>
+	</p>
+	<p>
 		!" Die Präsentation selbst sowie ihre Seiten werden mittels <html> artigen Tags implementiert." 
 	</p> 
 <np>
 	<h> !" Grundstruktur " </h>
-	<p> <source> s" example.p.fs" 0 100 </source> </p>
+	<p> s" example.p.fs" 0 100 <source> </p>
 <np>
 	<h> !" Grundstruktur " </h>
-	<p> <source> s" example.p.fs" 0 100 </source> </p>
+	<p> s" example.p.fs" 0 100 <source> </p>
 	<h> !" Ergebnis" </h>
 	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
@@ -80,35 +75,37 @@
 	</p>
 ( <np>
 	<h> !" Mit den wichtigsten Wörtern:" </h>
-	<p>
-		<li> <f> !" <presentation>" </f> !" : damit beginnt die praesentation" </li>
-		<li> <f> !" <h>" </f> !" : Eine Ueberschrift" </li>
-		<li> <f> !" <p>" </f> !" : Ein Paragraph" </li>
-		<li> <f> !" <b>" </f> !" : Fettdruck" </li>
-		<li> <f> !" <br>" </f> !" : Zeilenumbruch" </li>
-		<li> <f> !\" !\"" </f> !" : Ein String" </li>
-	</p> )
+	<li> <f> !" <presentation>" </f> !" : damit beginnt die praesentation" </li>
+	<li> <f> !" <h>" </f> !" : Eine Ueberschrift" </li>
+	<li> <f> !" <p>" </f> !" : Ein Paragraph" </li>
+	<li> <f> !" <b>" </f> !" : Fettdruck" </li>
+	<li> <f> !" <br>" </f> !" : Zeilenumbruch" </li>
+	<li> <f> !\" !\"" </f> !" : Ein String" </li>
+)
 <np>
-	<h> !" Benutzer Interaktion" </h>
-	<p>
-		!" Die Präsentation liegt im Speicher"
-	</p>
-	<p>
-		!" ==> Dadurch wird die Navigation über Forth Wörter möglich."
-	</p>
+	<h> !" Benutzerinteraktion" </h>
+	<p> !" Präsentation liegt im Speicher." </p>
+	<p> !" eigener Interpreter (showpage, executiontokens)" </p>
+	<p> !" ==> Dadurch wird die Navigation über Forth Wörter möglich." </p>
+	<br>
 	<li> !" n   => nächste Seite" </li>
 	<li> !" p   => vorige Seite"  </li>
 	<li> !" u   => seite aktualisieren"  </li>
 	<li> !" 3 g => Zur dritten Seite springen"  </li>
 	<li> !" 3 n => 3 Seiten vor springen" </li>
+<np>
+	<p>
+		<b> !" Features" </b>
+		<br>
+		!"   Features"
+	</p>
 <np> p4-1
 <np> p4-1 p4-2
 <np> p4-1 p4-2 p4-3
 <np> p4-1 p4-2 p4-3
-	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </li>
+	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </p>
 <np>
 	<h> !" Und Farben" </h>
-	<br>
 	<li> !" Hintergrundfarbe: " <f> s\" Yellow <bc> !\" text\" </bc> " !! </f> !" : " Yellow <bc> !\" text" </bc> </li>
 	<li> !" Vordergrundfarbe: " <f> s\" Brown <fc> !\" text\" </fc> " !! </f> !" : " Brown <fc> !\" text" </fc> </li>
 	<p> !" 8 Farben sind moeglich:" </p>
@@ -160,41 +157,31 @@
 <np> s"  Execute" s"                                 ^" interner-ablauf
 
 <np>
-	<p>
-		<h> !" Zeit für Makros!!" </h>
-		<source> s" presentation.p.fs" 29 39 </source>
-		<p> farbendemo </p>
-	</p>
+	<h> !" Zeit für Makros!!" </h>
+	<p> s" presentation.p.fs" 29 39 <source> </p>
+	<p> farbendemo </p>
 <np>
-	<p>
-		<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
-		<br> <br>
-		<b> !" So kann man Aufzaehlungen erstellen" </b>
-		<br> <br>
-		<en>
-			<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich" </||>
-			<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth persönlich. " </||>
-			<||> !" Makros generieren Inhalte" </||>
-		</en>
-		<source> s" presentation.p.fs" 112 116 </source>
-		<br> !" Die Operatoren sehen so aus:" <br>
-		<source> s" presentation.fs" 214 221 </source>
-	</p>
+	<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
+	( <p> <b> !" So kann man Aufzaehlungen erstellen" </b> </p>
+	<en>
+		<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich" </||>
+		<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth persönlich. " </||>
+		<||> !" Makros generieren Inhalte" </||>
+	</en> )
+	<p> s" presentation.p.fs" 112 116 <source> </p>
+	<p> !" Die Operatoren sehen so aus:" </p>
+	<p> s" presentation.fs" 214 221 <source> </p>
 <np>	
-	<p> <tw>
-		<h> !" Spezielle (verwendete) Features von Forth" </h>
-		<br> <br>
-		  <li> !" * Compiler VS Interpreter" </li>
-		  <li> !" * Execution Tokens" </li>
-		  <li> !" * Here , ," </li>
-		  <li> !" * Makros" </li>
-	</tw> </p>
+	<h> !" Spezielle (verwendete) Features von Forth" </h>
+	<br>
+	<li> !" Compiler VS Interpreter" </li>
+	<li> !" Execution Tokens" </li>
+	<li> !" Here, ," </li>
+	<li> !" Makros" </li>
+	<li> !" Exception (beim Parsen)" </li>
 <np>
 	<p>
-		<file> s" nochFragen.txt" 0 100 </file>
-		<tw>
-		<b> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </b> 
-		</tw>
+		s" nochFragen.txt" 0 100 <file>
+		<b> <tw> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </tw> </b>
 	</p>
-
 </presentation>

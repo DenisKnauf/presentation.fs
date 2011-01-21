@@ -150,19 +150,24 @@ ptype-reset
 
 : beep 0 term-height 2 - cursor! 7 emit s" *beep* not" type ;
 
+variable ok-
+: block? ok- @ 0= throw ;
+: block! ( i -- ) ok- dup @ throw ! ;
+: !block ( i -- ) ok- @ <> throw 0 ok- ! ;
+
 \ Es folgen ein paar syntaktische Textauszeichnungen.
-: {i}   ( addr -- addr )  7 sgr ;
-: <i>   ( -- ) ['] {i}  , ;
+: {i}   ( addr -- addr ) 7 sgr ;
+: <i>   ( -- ) block? ['] {i}  , ;
 : {/i}  ( addr -- addr ) 27 sgr ;
-: </i>  ( -- ) ['] {/i} , ;
+: </i>  ( -- ) block? ['] {/i} , ;
 : {b}   ( addr -- addr )  1 sgr ; \ bold
-: <b>   ( -- ) ['] {b}  , ;
+: <b>   ( -- ) block? ['] {b}  , ;
 : {/b}  ( addr -- addr ) 22 sgr ;
-: </b>  ( -- ) ['] {/b} , ;
+: </b>  ( -- ) block? ['] {/b} , ;
 : {u}   ( addr -- addr )  4 sgr ; \ underline
-: <u>   ( -- ) ['] {u}  , ;
+: <u>   ( -- ) block? ['] {u}  , ;
 : {/u}  ( addr -- addr ) 24 sgr ;
-: </u>  ( -- ) ['] {/u} , ;
+: </u>  ( -- ) block? ['] {/u} , ;
 : {fc}  ( addr -- addr ) dup @ 30 + sgr cell+ ; \ frontcolor
 : <fc>  ( -- ) ['] {fc} , , ;
 : {/fc} ( addr -- addr ) 39 sgr ;
@@ -188,7 +193,7 @@ ptype-reset
 	dup ptype-curx ! cursor>
 	cell+ {b}
 ; \ header
-: <h>   ( -- addr 0 , xt-{h} 0 )  ['] {h}  , here 0 , 0 ;
+: <h>   ( -- addr 0 , xt-{h} 0 ) [char] h block! ['] {h}  , here 0 , 0 ;
 : {/h}  ( addr , len -- addr1 )
 	{/b} cursorx@ 1+ \ addr x
 	cr
@@ -197,19 +202,19 @@ ptype-reset
 	cursorx@ +do ." =" loop \ addr
 	cr cell+
 ;
-: </h>  ( addr len -- , xt-{/h} len0 ) ['] {/h} , dup , swap ! ;
+: </h>  ( addr len -- , xt-{/h} len0 ) ['] {/h} , dup , swap ! [char] h !block ;
 : {p}   ( addr -- addr ) cr ptype-reset cell+ ; \ paragraph
-: <p>   ( -- addr u0 , xt-{p} 0 ) ['] {p}  , here 0 , 0 ;
+: <p>   ( -- addr u0 , xt-{p} 0 ) [char] p block! ['] {p}  , here 0 , 0 ;
 : {/p}  ( addr -- addr ) cr ;
-: </p>  ( addr len -- , xt-{/p} ) ['] {/p} , swap ! ;
+: </p>  ( addr len -- , xt-{/p} ) ['] {/p} , swap ! [char] p !block ;
 : {li}  ( addr -- addr )
-	2 cursor> space 1 cursor>
-	6 dup ptype-indent ! ptype-curx !
+	2 cursor> 32 sgr ." *" 39 sgr
+	4 ptype-indent ! 3 ptype-curx !
 	cell+
 ;
-: <li>  ( -- addr u0 , xt-{li} 0 ) ['] {li} , here 0 , 0 ;
+: <li>  ( -- addr u0 , xt-{li} 0 ) [char] l block! ['] {li} , here 0 , 0 ;
 : {/li} ( addr -- addr ) cr ;
-: </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! ;
+: </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! [char] l !block ;
 33 constant table-color
 : {|}   ( addr -- addr )
 	dup @ dup ptype-cursorx@ - \ addr > >-i
@@ -220,27 +225,28 @@ ptype-reset
 	endif
 	ptype-curx ! table-color sgr ." |" 39 sgr cell+
 ;
-: <|>   ( i -- addr , xt-{|} i ) ['] {|} , , ;
+: <|>   ( i -- addr , xt-{|} i ) block? ['] {|} , , ;
 : {-}   ( addr -- addr ) cr dup @ 0 table-color sgr +do [char] - emit loop 39 sgr cell+ cr ;
-: <->   ( i -- addr , xt-{-} i ) ['] {-} , , ;
+: <->   ( i -- addr , xt-{-} i ) block? ['] {-} , , ;
 
 variable enumerationCount ( -- addr )
 : {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
 	enumerationCount dup @ 1+ dup rot !
-	2 cursor> 0 u.r ." ." 1 cursor>
-	6 dup ptype-indent ! ptype-curx !
+	2 cursor> 0 u.r ." ." space
+	5 ptype-curx !
 ;
-: <||>  ( -- , xt-{||} 0 ) ['] {||} , ;
-: {/||} ( addr -- addr ) cr ;
-: </||> ( -- , xt-{/||} ) ['] {/||} , ;
+: <||>  ( -- , xt-{||} ) [char] e ok- @ <> throw ['] {||} , ;
+: {/||} ( -- ) cr ;
+: </||> ( -- , xt-{/||} ) ['] {/||} , ; \ [char] e ok- @ 2dup emit emit <> throw ;
 
 : {en}  ( -- )
+	cr
 	5 ptype-indent ! \ 6 Zeichen weit einruecken
 	0 enumerationCount ! \ resets enumeration count
 ;
-: <en>  ( -- , xt-{en}  )  ['] {en} , ;
+: <en>  ( -- , xt-{en}  )  [char] e block! ['] {en} , ;
 : {/en} ( -- ) ptype-reset ;
-: </en> ( -- , xt-{/en} )  ['] {en} , ;
+: </en> ( -- , xt-{/en} )  ['] {en} , [char] e !block ;
 
 256 Constant max-line
 Create line-buffer  max-line 2 + allot
@@ -250,9 +256,7 @@ Create line-buffer  max-line 2 + allot
 
 : printsource ( from to addr u 1/0 -- )
 	{ showLines }
-	open-input
-	cr
-	0
+	open-input cr 0
 	begin
 		1+ line-buffer max-line fd-in read-line throw
 	while
@@ -263,7 +267,7 @@ Create line-buffer  max-line 2 + allot
 				dup ptype-curx ! 1- \ i str l l indent
 				swap - dup 0< if drop else cursor> then \ i str l
 				showLines if
-					type ." |" \ ... i  \ Eingerueckt Zahl ausgeben
+					33 sgr type ." |" 39 sgr \ ... i  \ Eingerueckt Zahl ausgeben
 				else 2drop \ Eingerueckt keine Zahl ausgeben
 				endif
 				swap line-buffer swap ptype cr
@@ -282,27 +286,26 @@ Create line-buffer  max-line 2 + allot
 	2dup > if swap then \ addr namelen start/end end/start
 	showLines if dup 0 <# #s #> nip else 0 then ptype-reset 1+ ptype-indent !
   2swap \ start end addr namelen
-	showLines printsource cr
+	showLines printsource
 ;
 
-: {source}  ( -- ) ;
-: <source>  ( -- , xt-{source}  )  ['] {source} , ;
-: {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
-		   @ swap cell 3 * + @ 1 printCodeHeader 4 cells + ;
-: </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
+: {source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
+		   @ swap cell 3 * + @ 1 printCodeHeader 4 cells + ptype-reset ;
+: <source> ( addr len from to -- , xt-{source} )  ['] {source} , , , , , ;
 
-: {file}  ( -- ) ;
-: <file>  ( -- , xt-{file}  )  ['] {file} , ;
-: {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
-		   @ swap cell 3 * + @ 0 printCodeHeader 4 cells + ;
-: </file> ( -- , xt-{/file} )  ['] {/file} , , , , , ;
+: {file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
+		   @ swap cell 3 * + @ 0 printCodeHeader 4 cells + ptype-reset ;
+: <file> ( addr len from to -- , xt-{file} )  ['] {file} , , , , , ;
 
 : {np} ( -- )
 	0 sgr \ Alle Bildschirmeigenschaften zuruecksetzen
 	page \ Bildschirm leeren
 ;
+variable np-sign
+0 np-sign !
 : {/np} ( -- )
 	\ 30 sgr 40 sgr
+	np-sign @ dup if execute 0 np-sign ! else drop then
 	0 term-height dup cursory@ - 2 / dup 0< if drop else screen_ then 2 - cursor!
 ;
 : <np> ( -- addr , xt-{/np} xt-{np} )
@@ -384,6 +387,10 @@ variable pres-restore 3 cells allot
 	swap cell+ @
 	0
 ;
+
+variable psee_
+: psee' 20 0 +do [char] - emit loop cr  psee_ @ xt-see ;
+: psee ['] psee' np-sign ! ' psee_ ! u ;
 
 : <presentation> ( -- addr0 0 addr1 , xt-{np} ) here 0 here ['] {np} , ;
 : </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
