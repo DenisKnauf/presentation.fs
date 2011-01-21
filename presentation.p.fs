@@ -91,18 +91,16 @@
 <np>
 	<h> !" Benutzer Interaktion" </h>
 	<p>
-		<br> <br>
 		!" Die Präsentation liegt im Speicher"
-		<br> <br>
-		 !" ==> Dadurch wird die Navigation über Forth Wörter möglich."
-		<br>
-		<br>
-		<li> !" n   => nächste Seite" </li>
-		<li> !" p   => vorige Seite"  </li>
-		<li> !" u   => seite aktualisieren"  </li>
-		<li> !" 3 g => Zur dritten Seite springen"  </li>
-		<li> !" 3 n => 3 Seiten vor springen" </li>
 	</p>
+	<p>
+		!" ==> Dadurch wird die Navigation über Forth Wörter möglich."
+	</p>
+	<li> !" n   => nächste Seite" </li>
+	<li> !" p   => vorige Seite"  </li>
+	<li> !" u   => seite aktualisieren"  </li>
+	<li> !" 3 g => Zur dritten Seite springen"  </li>
+	<li> !" 3 n => 3 Seiten vor springen" </li>
 <np> p4-1
 <np> p4-1 p4-2
 <np> p4-1 p4-2 p4-3
