@@ -108,6 +108,10 @@
 <np> p4-1 p4-2 p4-3
 <np> p4-1 p4-2 p4-3
 	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </p>
+<np> p4-1 p4-2 p4-3
+	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </p>
+	<br>
+	<p> !" Automatischer Zeilenumbruch" </p>
 <np>
 	<h> !" Und Farben" </h>
 	<li> !" Hintergrundfarbe: " <f> s\" Yellow <bc> !\" text\" </bc> " !! </f> !" : " Yellow <bc> !\" text" </bc> </li>
@@ -165,6 +169,12 @@
 <np> s"  {!!}"    s"                   ^---^" interner-ablauf
 <np> s"  Execute" s"                            ^" interner-ablauf
 <np> s"  Execute" s"                                 ^" interner-ablauf
+<np>
+	<h> !" ptype" </h>
+	<li> !" ptype ersetzt type" </li>
+	<li> !" ptype-type -> type" </li>
+	<li> !\" oder: ptype-type -> typewriter-type (Text wird \"getippt\")" </li>
+	<li> !" Ermoeglicht automatischen Zeilenumbruch (Zaehlt gedruckte Zeichen mit)" </li>
 
 <np>
 	s" Erweiterbarkeit" <part>
