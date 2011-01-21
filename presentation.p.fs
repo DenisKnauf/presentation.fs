@@ -71,30 +71,15 @@
 		<br>
 		<br>
 		<source> s" example.p.fs" 0 100 </source>
-	</p>
-<np>
-	<p>
-		<h> !" Die wichtigsten Wörter" </h>
 		<br>
-		<br>
+		<b> !" Mit den wichtigsten Wörtern:" </b>
+		<br> <br>
 		<li> !" <prasentation>" </li>
 		<li> !" <h>"   </li>
 		<li> !" <p>"  </li>
 		<li> !" <b>"  </li>
 		<li> !" <br>" </li>
 		<br>
-		<li> !\" !\" " </li>
-	</p>
-<np>
-	<p>
-		<h> !" Memory layout von <prasentation> " </h>
-		<br>
-		<br>
-		!" Sollten wir das hier beschreiben?"
-	</p>
-<np>
-	<p>
-		<h> !" Wie <prasentation> abgearbeitet wrid" </h>
 	</p>
 <np>
 	p4-1
@@ -187,15 +172,10 @@
 	</tw> </p>
 <np>
 	<p>
-		<tw>
 		<file> s" nochFragen.txt" 0 100 </file>
-		</tw>
-	</p>
-<np>
-	<p>
 		<tw>
-		<file> s" danke.txt" 0 100 </file>
-		<b> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </b> <br>
+		<b> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </b> 
 		</tw>
 	</p>
+
 </presentation>
