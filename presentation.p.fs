@@ -16,7 +16,6 @@
 	<li> <f> s\" <h> !\" Eine Ueberschrift\" </h>" !! </f> </li>
 	<li> <f> s\" <p> !\" Einfacher Text\" </p>" !! </f> </li>
 	<li> <f> s\" <li> !\" Listen, wie diese hier\" </li>" !! </f> </li>
-	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </li>
 ;
 
 : p4-3
@@ -43,9 +42,11 @@
 	<h> !" Interner Ablauf" </h>
 	<p>
 		71 <->
+		1 <|> !"  Beschreibung" 18 <|> s\"  ... <p> <i> !\" text \" </i> </p> ..." !! 56 <|> !"  in forth" 71 <|>
+		71 <->
 		1 <|> !"  Speicheraufbau" 18 <|> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! 56 <|> s\"  here-\"stack\"" !! 71 <|>
 		<br>
-		1 <|> a b !! 18 <|> <b> c d !! </b> 56 <|> 71 <|>
+		1 <|> <b> a b </b> !! 18 <|> <b> c d !! </b> 56 <|> 71 <|>
 		71 <->
 	</p>
 ;
@@ -57,8 +58,8 @@
 		\ <b> !" Denis Knauf & Harald Steinlechner" </b>
 	</p>
 <np>
+	<h> !" Präsentationssoftware in Forth" </h>
 	<p>
-		<h> !" Präsentationssoftware in Forth" </h>
 		<br>
 		<br>
 		!" Die flexible Forth-Syntax erlaubt die deklarative Representation von formatierten Text in Forth."
@@ -66,27 +67,32 @@
 		!" Die Präsentation selbst sowie ihre Seiten werden mittels <html> artigen Tags implementiert." 
 	</p> 
 <np>
+	<h> !" Grundstruktur " </h>
+	<p> <source> s" example.p.fs" 0 100 </source> </p>
+<np>
+	<h> !" Grundstruktur " </h>
+	<p> <source> s" example.p.fs" 0 100 </source> </p>
+	<h> !" Ergebnis" </h>
+	<h> !" Dies ist eine Testpraesentation!" </h>
 	<p>
-		<h> !" Grundstruktur " </h>
-		<br>
-		<br>
-		<source> s" example.p.fs" 0 100 </source>
-		<br>
-		<b> !" Mit den wichtigsten Wörtern:" </b>
-		<br> <br>
-		<li> !" <prasentation>" </li>
-		<li> !" <h>"   </li>
-		<li> !" <p>"  </li>
-		<li> !" <b>"  </li>
-		<li> !" <br>" </li>
-		<br>
+		!" Eines Tages hatten wir [Harald Steinlechner und Denis Knauf"
+		!" ] die tolle Idee, eine Praesentationssoftware zu schreiben."
 	</p>
-<np>
-	p4-1
-<np>
-	p4-1 p4-2
-<np>
-	p4-1 p4-2 p4-3
+( <np>
+	<h> !" Mit den wichtigsten Wörtern:" </h>
+	<p>
+		<li> <f> !" <presentation>" </f> !" : damit beginnt die praesentation" </li>
+		<li> <f> !" <h>" </f> !" : Eine Ueberschrift" </li>
+		<li> <f> !" <p>" </f> !" : Ein Paragraph" </li>
+		<li> <f> !" <b>" </f> !" : Fettdruck" </li>
+		<li> <f> !" <br>" </f> !" : Zeilenumbruch" </li>
+		<li> <f> !\" !\"" </f> !" : Ein String" </li>
+	</p> )
+<np> p4-1
+<np> p4-1 p4-2
+<np> p4-1 p4-2 p4-3
+<np> p4-1 p4-2 p4-3
+	<p> !" Eine neue Seite definieren: " <f> !" <np>" </f> </li>
 <np>
 	<h> !" Und Farben" </h>
 	<br>

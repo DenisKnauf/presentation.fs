@@ -378,7 +378,12 @@ variable pres-restore 3 cells allot
 : p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 ) page_steps cells + showpage ;
 : u ( faddr laddr paddr X     -- faddr laddr paddr 0 ) drop showpage ;
 : q bye ;
-: r ( -- faddr laddr paddr 0 ) pres-restore @ pres-restore cell+ @ pres-restore 2 cells + @ 0 ;
+: r ( -- faddr laddr paddr 0 )
+	pres-restore dup @
+	swap cell+ dup @
+	swap cell+ @
+	0
+;
 
 : <presentation> ( -- addr0 0 addr1 , xt-{np} ) here 0 here ['] {np} , ;
 : </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )
