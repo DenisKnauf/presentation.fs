@@ -59,12 +59,9 @@
 		<br>
 		<br>
 		<source> s" example.p.fs" 0 100 </source>
-	</p>
-<np>
-	<p>
-		<h> !" Die wichtigsten Wörter" </h>
 		<br>
-		<br>
+		<b> !" Mit den wichtigsten Wörtern:" </b>
+		<br> <br>
 		<li> !" <prasentation>" </li>
 		<li> !" <h>"   </li>
 		<li> !" <p>"  </li>
@@ -169,4 +166,5 @@
 		<b> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </b> 
 		</tw>
 	</p>
+
 </presentation>
