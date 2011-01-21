@@ -97,6 +97,53 @@
 	<li> !" Vordergrundfarbe: " <f> s\" Brown <fc> !\" text\" </fc> " !! </f> !" : " Brown <fc> !\" text" </fc> </li>
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
+
+<np>
+	<h> !" Interner Aufbau" </h>
+	<p>
+		71 <->
+		1 <|> <b> !"  Beschreibung" </b> 18 <|> 56 <|> <b> !"  in forth" </b> 71 <|>
+		71 <->
+		1 <|> 18 <|> 56 <|> 71 <|>
+		71 <->
+	</p>
+<np>
+	<h> !" Interner Aufbau" </h>
+	<p>
+		71 <->
+		1 <|> !"  Beschreibung" 18 <|> 56 <|> !"  in forth" 71 <|>
+		71 <->
+		1 <|> <b> !"  Speicheraufbau" </b> 18 <|> 56 <|> <b> !\"  here-\"stack\"" </b> 71 <|>
+		71 <->
+	</p>
+<np>
+	<h> !" Interner Aufbau" </h>
+	<p>
+		71 <->
+		1 <|> !"  Beschreibung" 18 <|> <b> s\"  ... <p> <i> !\" text \" </i> </p> ..." !! </b> 56 <|> !"  in forth" 71 <|>
+		71 <->
+		1 <|> !"  Speicheraufbau" 18 <|> 56 <|> !\"  here-\"stack\"" 71 <|>
+		71 <->
+	</p>
+<np>
+	<h> !" Interner Aufbau" </h>
+	<p>
+		71 <->
+		1 <|> !"  Beschreibung" 18 <|> s\"  ... <p> <i> !\" text \" </i> </p> ..." !! 56 <|> !"  in forth" 71 <|>
+		71 <->
+		1 <|> !"  Speicheraufbau" 18 <|> <b> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! </b> 56 <|> !\"  here-\"stack\"" 71 <|>
+		71 <->
+	</p>
+<np>
+	<h> !" Interner Aublauf" </h>
+	<p>
+		71 <->
+		1 <|> !"  Speicheraufbau" 18 <|> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! 56 <|> !\"  here-\"stack\"" 71 <|>
+		<br>
+		1 <|> !"  Execute" 18 <|> <b>    s\"   ^" !! </b> 56 <|> 71 <|>
+		71 <->
+	</p>
+
 <np>
 	<p>
 		<h> !" Zeit für Makros!!" </h>

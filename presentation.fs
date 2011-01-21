@@ -210,6 +210,19 @@ ptype-reset
 : <li>  ( -- addr u0 , xt-{li} 0 ) ['] {li} , here 0 , 0 ;
 : {/li} ( addr -- addr ) cr ;
 : </li> ( addr len -- , xt-{/li} ) ['] {/li} , swap ! ;
+33 constant table-color
+: {|}   ( addr -- addr )
+	dup @ dup ptype-cursorx@ - \ addr > >-i
+	dup 1 < if
+		drop
+	else
+		1- spaces
+	endif
+	ptype-curx ! table-color sgr ." |" 39 sgr cell+
+;
+: <|>   ( i -- addr , xt-{|} i ) ['] {|} , , ;
+: {-}   ( addr -- addr ) cr dup @ 0 table-color sgr +do [char] - emit loop 39 sgr cell+ cr ;
+: <->   ( i -- addr , xt-{-} i ) ['] {-} , , ;
 
 variable enumerationCount ( -- addr )
 : {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
@@ -272,15 +285,15 @@ Create line-buffer  max-line 2 + allot
 	showLines printsource cr
 ;
 
-: {source}  ( -- ) ;   
+: {source}  ( -- ) ;
 : <source>  ( -- , xt-{source}  )  ['] {source} , ;
-: {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+: {/source} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
 		   @ swap cell 3 * + @ 1 printCodeHeader 4 cells + ;
 : </source> ( -- , xt-{/source} )  ['] {/source} , , , , , ;
 
-: {file}  ( -- ) ;   
+: {file}  ( -- ) ;
 : <file>  ( -- , xt-{file}  )  ['] {file} , ;
-: {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * + 
+: {/file} ( -- ) dup dup dup dup @ swap cell + @  2swap cell 2 * +
 		   @ swap cell 3 * + @ 0 printCodeHeader 4 cells + ;
 : </file> ( -- , xt-{/file} )  ['] {/file} , , , , , ;
 
