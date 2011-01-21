@@ -167,18 +167,18 @@
 	</p>
 <np>
 	<p>
-		<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
+		<h> !" Wie kann man eigene Formatierungstags hinzufügen?" </h>
 		<br> <br>
 		<b> !" So kann man Aufzaehlungen erstellen" </b>
 		<br> <br>
 		<en>
-			<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich" </||>
-			<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth persönlich. " </||>
-			<||> !" Makros generieren Inhalte" </||>
+			<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich aufgrund der Syntax" </||>
+			<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth. " </||>
+			<||> !" Auch Markos können verwendet werden" </||>
 		</en>
-		<source> s" presentation.p.fs" 112 116 </source>
+		<source> s" presentation.p.fs" 174 178 </source>
 		<br> !" Die Operatoren sehen so aus:" <br>
-		<source> s" presentation.fs" 214 221 </source>
+		<source> s" presentation.fs" 227 235 </source>
 	</p>
 <np>	
 	<p> <tw>
