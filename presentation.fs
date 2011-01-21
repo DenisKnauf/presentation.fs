@@ -334,6 +334,8 @@ Create line-buffer  max-line 2 + allot
 : pres_page_from ( addr -- addr ) cell+ ;
 : pres_page_to ( addr -- addr ) 2 cells + ;
 
+variable pres-restore 3 cells allot
+
 \ faddr: erste Seitenzeigeradresse (letzte Presentationsseite)
 \ laddr: letzte Seitenzeigeradresse (erste Presentationsseite)
 \ paddr: derzeitige Seitenzeigeradresse
@@ -367,12 +369,16 @@ Create line-buffer  max-line 2 + allot
 	validpage? 0 tuck 2-rot drop \ i 0 faddr laddr paddr0
 	dup showpage' 0 2rot drop \ faddr laddr paddr0 0 i
 	if beep then
+	2over swap pres-restore !
+	pres-restore cell+ !
+	over pres-restore 2 cells + !
 ;
 : n ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 ) page_steps cells - showpage ;
 : g ( faddr laddr paddr 0  u  -- faddr laddr paddr 0 ) cells nip nip over swap - showpage ;
 : p ( faddr laddr paddr 0 [u] -- faddr laddr paddr 0 ) page_steps cells + showpage ;
 : u ( faddr laddr paddr X     -- faddr laddr paddr 0 ) drop showpage ;
 : q bye ;
+: r ( -- faddr laddr paddr 0 ) pres-restore @ pres-restore cell+ @ pres-restore 2 cells + @ 0 ;
 
 : <presentation> ( -- addr0 0 addr1 , xt-{np} ) here 0 here ['] {np} , ;
 : </presentation> ( 0 <addr...> -- faddr laddr paddr 0 !! endaddr 0 0 0 0 <...addr> )

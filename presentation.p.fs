@@ -38,6 +38,18 @@
 ; immediate
 : farbendemo   farbendemo' </bc> </fc> ;
 
+: interner-ablauf
+	{ a b c d }
+	<h> !" Interner Ablauf" </h>
+	<p>
+		71 <->
+		1 <|> !"  Speicheraufbau" 18 <|> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! 56 <|> s\"  here-\"stack\"" !! 71 <|>
+		<br>
+		1 <|> a b !! 18 <|> <b> c d !! </b> 56 <|> 71 <|>
+		71 <->
+	</p>
+;
+
 <presentation>
 	<p>
 		<file> s" header.txt" 0 100 </file>
@@ -134,15 +146,14 @@
 		1 <|> !"  Speicheraufbau" 18 <|> <b> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! </b> 56 <|> !\"  here-\"stack\"" 71 <|>
 		71 <->
 	</p>
-<np>
-	<h> !" Interner Aublauf" </h>
-	<p>
-		71 <->
-		1 <|> !"  Speicheraufbau" 18 <|> s\"  {p} 5 {i} {!!} addr len {/i} {/p} " !! 56 <|> !\"  here-\"stack\"" 71 <|>
-		<br>
-		1 <|> !"  Execute" 18 <|> <b>    s\"   ^" !! </b> 56 <|> 71 <|>
-		71 <->
-	</p>
+
+<np> s"  Execute" s"   ^" interner-ablauf
+<np> s"  {p}"     s"      ^" interner-ablauf
+<np> s"  Execute" s"         ^" interner-ablauf
+<np> s"  Execute" s"             ^" interner-ablauf
+<np> s"  {!!}"    s"                   ^---^" interner-ablauf
+<np> s"  Execute" s"                            ^" interner-ablauf
+<np> s"  Execute" s"                                 ^" interner-ablauf
 
 <np>
 	<p>
