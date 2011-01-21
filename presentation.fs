@@ -233,20 +233,20 @@ variable enumerationCount ( -- addr )
 : {||}  ( addr -- addr )                \ increments enumeration count and prints prefix
 	enumerationCount dup @ 1+ dup rot !
 	2 cursor> 0 u.r ." ." space
-	5 ptype-curx !
+	5 ptype-curx ! 0
 ;
-: <||>  ( -- , xt-{||} ) [char] e ok- @ <> throw ['] {||} , ;
+: <||>  ( -- , xt-{||} ) block? <> throw ['] {||} , ;
 : {/||} ( -- ) cr ;
-: </||> ( -- , xt-{/||} ) ['] {/||} , ; \ [char] e ok- @ 2dup emit emit <> throw ;
+: </||> ( -- , xt-{/||} ) ['] {/||} , block? ;
 
 : {en}  ( -- )
 	cr
 	5 ptype-indent ! \ 6 Zeichen weit einruecken
 	0 enumerationCount ! \ resets enumeration count
 ;
-: <en>  ( -- , xt-{en}  )  [char] e block! ['] {en} , ;
+: <en>  ( -- , xt-{en}  )  block? ['] {en} , ;
 : {/en} ( -- ) ptype-reset ;
-: </en> ( -- , xt-{/en} )  ['] {en} , [char] e !block ;
+: </en> ( -- , xt-{/en} )  ['] {en} , block? ;
 
 256 Constant max-line
 Create line-buffer  max-line 2 + allot
