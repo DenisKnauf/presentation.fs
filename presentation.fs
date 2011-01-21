@@ -235,7 +235,7 @@ variable enumerationCount ( -- addr )
 	2 cursor> 0 u.r ." ." space
 	5 ptype-curx ! 0
 ;
-: <||>  ( -- , xt-{||} ) block? <> throw ['] {||} , ;
+: <||>  ( -- , xt-{||} ) block? ['] {||} , ;
 : {/||} ( -- ) cr ;
 : </||> ( -- , xt-{/||} ) ['] {/||} , block? ;
 

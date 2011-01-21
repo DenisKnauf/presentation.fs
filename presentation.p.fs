@@ -174,14 +174,14 @@
 	<p> farbendemo </p>
 <np>
 	<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
-	<p> <b> !" So kann man Aufzaehlungen erstellen" </b> </p>
+	( <p> <b> !" So kann man Aufzaehlungen erstellen" </b> </p>
 	<p>
 		<en>
 			<||> !" Das erstellen von Präsentationen und Formatierungen wirkt natürlich" </||>
 			<||> !" Unsere Sprache erbt die gesamte Funktionalität von Forth persönlich." </||>
 			<||> !" Makros generieren Inhalte" </||>
 		</en>
-	</p>
+	</p> )
 	<p> s" presentation.p.fs" 112 116 <source> </p>
 	<p> !" Die Operatoren sehen so aus:" </p>
 	<p> s" presentation.fs" 214 221 <source> </p>
