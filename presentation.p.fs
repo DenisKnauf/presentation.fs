@@ -3,6 +3,14 @@
 : <f> <b> Blue <fc> ;
 : </f> </fc> </b> ;
 
+: <part>
+	{ a b }
+	<p>
+		<b> a b !! </b>
+		<br>
+		!"   " a b !!
+	</p>
+;
 : p4-1
 	<h> !" Welche Funktionen sind moeglich?" </h>
 	<p>
@@ -94,11 +102,7 @@
 	<li> !" 3 g => Zur dritten Seite springen"  </li>
 	<li> !" 3 n => 3 Seiten vor springen" </li>
 <np>
-	<p>
-		<b> !" Features" </b>
-		<br>
-		!"   Features"
-	</p>
+	s" Features" <part>
 <np> p4-1
 <np> p4-1 p4-2
 <np> p4-1 p4-2 p4-3
@@ -111,6 +115,12 @@
 	<p> !" 8 Farben sind moeglich:" </p>
 	<p> farbendemo </p>
 
+<np>
+	s" Intern" <part>
+	<br> <br> <br> <br>
+	<p>
+		!" 0111000101010100010101011111100000110101010101011001010100000011101010101"
+	</p>
 <np>
 	<h> !" Interner Aufbau" </h>
 	<p>
@@ -157,6 +167,8 @@
 <np> s"  Execute" s"                                 ^" interner-ablauf
 
 <np>
+	s" Erweiterbarkeit" <part>
+<np>
 	<h> !" Zeit für Makros!!" </h>
 	<p> s" presentation.p.fs" 29 39 <source> </p>
 	<p> farbendemo </p>
@@ -182,6 +194,10 @@
 <np>
 	<p>
 		s" nochFragen.txt" 0 100 <file>
+	</p>
+	<p>
 		<b> <tw> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </tw> </b>
+		<br>
+		<b> <scroll> !" denis.knauf@gmail.com | haraldsteinlechner@gmail.com" </scroll> </b>
 	</p>
 </presentation>
