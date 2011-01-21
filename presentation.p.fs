@@ -173,7 +173,7 @@
 	<p> s" farbendemo.fs" 0 100 <source> </p>
 	<p> farbendemo </p>
 <np>
-	<h> !" Beliebige Wörter können Inhalte erzeugen!!" </h>
+	<h> !" Was wenn zusätzliche Formatierungstags benötigt werden?" </h>
 	( <p> <b> !" So kann man Aufzaehlungen erstellen" </b> </p>
 	<p>
 		<en>
@@ -182,9 +182,10 @@
 			<||> !" Makros generieren Inhalte" </||>
 		</en>
 	</p> )
-	<p> s" presentation.p.fs" 112 116 <source> </p>
-	<p> !" Die Operatoren sehen so aus:" </p>
-	<p> s" presentation.fs" 214 221 <source> </p>
+	<p> s" farbendemo.fs" 0 5 <source> </p>
+	<p> s" presentation.p.fs" 185 185 <source> </p>
+	<p> !" Die implementierung des Tags <source>:" </p>
+	<p> s" sourceTag.fs" 0 100 <source> </p>
 <np>	
 	<h> !" Spezielle (verwendete) Features von Forth" </h>
 	<br>
